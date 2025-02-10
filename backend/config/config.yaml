@@ -1,0 +1,24 @@
+server:
+  port: 8080
+  mode: debug
+
+database:
+  driver: mysql
+  host: mysql2.sqlpub.com
+  port: 3307
+  username: root_baozi
+  password: 9L3RqvL75ydDKQnr
+  dbname: sys_erp
+  max_idle_conns: 10
+  max_open_conns: 100
+
+jwt:
+  secret: your-secret-key
+  expire: 24 # hours
+
+log:
+  level: debug
+  filename: ./logs/app.log
+  max_size: 100
+  max_age: 30
+  max_backups: 10 

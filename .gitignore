@@ -1,0 +1,13 @@
+/sys-admin/node_modules
+/sys-admin/.env.local
+/sys-admin/.umirc.local.ts
+/sys-admin/config/config.local.ts
+/sys-admin/src/.umi
+/sys-admin/src/.umi-production
+/sys-admin/src/.umi-test
+/sys-admin/.umi
+/sys-admin/.umi-production
+/sys-admin/.umi-test
+/sys-admin/dist
+/sys-admin/.mfsu
+/sys-admin/.swc
