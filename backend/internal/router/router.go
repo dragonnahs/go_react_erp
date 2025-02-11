@@ -1,32 +1,25 @@
+/*
+ * @Author: shanlonglong danlonglong@weimiao.cn
+ * @Date: 2025-02-08 16:47:26
+ * @LastEditors: shanlonglong danlonglong@weimiao.cn
+ * @LastEditTime: 2025-02-10 13:59:19
+ * @FilePath: \go_react_erp\backend\internal\router\router.go
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ */
 package router
 
 import (
-	"erp-sys/internal/controller"
-	"erp-sys/internal/middleware"
-
 	"github.com/gin-gonic/gin"
 )
 
+// RegisterRoutes 注册所有路由
 func RegisterRoutes(r *gin.Engine) {
 	// API 版本组
 	v1 := r.Group("/api/v1")
 	
-	// 用户相关路由
-	userController := controller.NewUserController()
-	// 公开路由
-	v1.POST("/login", userController.Login)
-	v1.POST("/register", userController.Register)
-
-	// 需要认证的路由
-	userGroup := v1.Group("/users")
-	userGroup.Use(middleware.Auth())
-	{
-		userGroup.GET("", userController.List)
-		userGroup.POST("", userController.Create)
-		userGroup.GET("/:id", userController.GetById)
-		userGroup.PUT("/:id", userController.Update)
-		userGroup.DELETE("/:id", userController.Delete)
-	}
+	// 注册各模块路由
+	RegisterUserRoutes(v1)  // 用户模块路由
+	RegisterMenuRoutes(v1)  // 菜单模块路由
 	
-	// 其他业务模块路由...
+	// ... 其他模块路由注册
 } 

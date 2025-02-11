@@ -5,12 +5,41 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Launch file",
+            "name": "Debug Backend",
             "type": "go",
             "request": "launch",
-            "mode": "debug",
-            "program": "${workspaceFolder}/backend"
+            "mode": "auto",
+            "program": "${workspaceFolder}/backend/main.go",
+            "cwd": "${workspaceFolder}/backend",
+            "env": {
+                "GO_ENV": "development",
+                "CONFIG_FILE": "config/config.yaml"
+            },
+            "args": [],
+            "showLog": true
+        },
+        {
+            "name": "Debug Backend Tests",
+            "type": "go",
+            "request": "launch",
+            "mode": "test",
+            "program": "${workspaceFolder}/backend",
+            "args": [
+                "-test.v"
+            ],
+            "showLog": true
+        },
+        {
+            "name": "Debug Current Test File",
+            "type": "go",
+            "request": "launch",
+            "mode": "test",
+            "program": "${file}",
+            "args": [
+                "-test.v"
+            ],
+            "showLog": true
         }
-
-    ]
+    ],
+    "compounds": []
 }

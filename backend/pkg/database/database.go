@@ -2,7 +2,7 @@
  * @Author: shanlonglong danlonglong@weimiao.cn
  * @Date: 2025-02-08 16:47:16
  * @LastEditors: shanlonglong danlonglong@weimiao.cn
- * @LastEditTime: 2025-02-08 17:52:36
+ * @LastEditTime: 2025-02-10 14:10:25
  * @FilePath: \go_react_erp\erp-sys\pkg\database\database.go
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -48,8 +48,13 @@ func Init() {
 	sqlDB.SetMaxOpenConns(config.Config.GetInt("database.max_open_conns"))
 
 	// 自动迁移数据库结构
-	err = DB.AutoMigrate(&model.User{})
+	err = DB.AutoMigrate(
+		&model.User{},
+		&model.Menu{},
+	)
 	if err != nil {
 		logger.Log.Fatal("Failed to auto migrate database", zap.Error(err))
 	}
+
+	fmt.Println("Database connected and migrated successfully")
 } 
