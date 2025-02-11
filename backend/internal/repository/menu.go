@@ -14,6 +14,13 @@ func NewMenuRepository() *MenuRepository {
 	return &MenuRepository{}
 }
 
+// TreeNode 表示树形结构的节点
+type TreeNode struct {
+	ID       uint        `json:"id"`
+	Name     string      `json:"name"`
+	Children []*TreeNode `json:"children,omitempty"`
+}
+
 // buildMenuTree 构建菜单树形结构的通用方法
 func buildMenuTree(menus []model.Menu) []model.Menu {
 	menuMap := make(map[uint]*model.Menu)
@@ -155,17 +162,62 @@ func (r *MenuRepository) FindAll(page, pageSize int) ([]model.Menu, int64, error
 	return treeMenus, rootCount, nil
 }
 
-// GetMenuTree 获取完整的菜单树
-func (r *MenuRepository) GetMenuTree() ([]model.Menu, error) {
+// buildMenuTreeForSelect 构建用于选择器的菜单树
+func buildMenuTreeForSelect(menus []model.Menu) []*TreeNode {
+	menuMap := make(map[uint]*TreeNode)
+	var rootNodes []*TreeNode
+
+	// 第一步：创建所有节点并建立映射关系
+	for _, menu := range menus {
+		node := &TreeNode{
+			ID:       menu.ID,
+			Name:     menu.Name,
+			Children: make([]*TreeNode, 0),
+		}
+		menuMap[menu.ID] = node
+	}
+
+	// 第二步：构建父子关系
+	for _, menu := range menus {
+		if menu.ParentID == 0 {
+			rootNodes = append(rootNodes, menuMap[menu.ID])
+		} else {
+			if parent, exists := menuMap[menu.ParentID]; exists {
+				parent.Children = append(parent.Children, menuMap[menu.ID])
+			}
+		}
+	}
+
+	// 第三步：递归排序
+	sortTreeNodes(rootNodes)
+
+	return rootNodes
+}
+
+// sortTreeNodes 递归排序树节点
+func sortTreeNodes(nodes []*TreeNode) {
+	if len(nodes) > 0 {
+		for _, node := range nodes {
+			if len(node.Children) > 0 {
+				sortTreeNodes(node.Children)
+			}
+		}
+	}
+}
+
+// GetMenuTree 获取用于选择的菜单树
+func (r *MenuRepository) GetMenuTree() ([]*TreeNode, error) {
 	var menus []model.Menu
 	
-	// 获取所有菜单
-	err := database.DB.Order("sort asc").Find(&menus).Error
+	// 只获取菜单类型的数据（不包括按钮）
+	err := database.DB.Where("type = ?", "menu").
+		Order("sort asc").
+		Find(&menus).Error
 	if err != nil {
 		return nil, err
 	}
 
-	return buildMenuTree(menus), nil
+	return buildMenuTreeForSelect(menus), nil
 }
 
 // Create 创建菜单
@@ -224,6 +276,19 @@ func (r *MenuRepository) GetVisibleMenus() ([]model.Menu, error) {
 	err := database.DB.Where("visible = ? AND type = ?", true, "menu").
 		Order("sort asc").
 		Find(&menus).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return buildMenuTree(menus), nil
+}
+
+// GetFullMenuTree 获取完整的菜单树（包括按钮）
+func (r *MenuRepository) GetFullMenuTree() ([]model.Menu, error) {
+	var menus []model.Menu
+	
+	// 获取所有菜单和按钮，并按照排序字段排序
+	err := database.DB.Order("sort asc").Find(&menus).Error
 	if err != nil {
 		return nil, err
 	}

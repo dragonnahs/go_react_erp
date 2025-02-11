@@ -2,7 +2,7 @@
  * @Author: shanlonglong danlonglong@weimiao.cn
  * @Date: 2025-02-08 16:47:16
  * @LastEditors: shanlonglong danlonglong@weimiao.cn
- * @LastEditTime: 2025-02-10 14:10:25
+ * @LastEditTime: 2025-02-11 16:00:07
  * @FilePath: \go_react_erp\erp-sys\pkg\database\database.go
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -51,6 +51,8 @@ func Init() {
 	err = DB.AutoMigrate(
 		&model.User{},
 		&model.Menu{},
+		&model.Role{},
+		&model.RoleMenu{},
 	)
 	if err != nil {
 		logger.Log.Fatal("Failed to auto migrate database", zap.Error(err))

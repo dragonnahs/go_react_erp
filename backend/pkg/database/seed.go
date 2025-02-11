@@ -91,4 +91,70 @@ func SeedData() {
 			log.Printf("Failed to seed menu data: %v", err)
 		}
 	}
+}
+
+
+func InitRoles() {
+	var count int64
+	DB.Model(&model.Role{}).Count(&count)
+	if count > 0 {
+		return
+	}
+
+	// 创建超级管理员角色
+	adminRole := model.Role{
+		Name:        "超级管理员",
+		Code:        "admin",
+		Description: "系统超级管理员，拥有所有权限",
+		Status:      true,
+		Sort:        0,
+	}
+	if err := DB.Create(&adminRole).Error; err != nil {
+		log.Printf("Failed to create admin role: %v", err)
+		return
+	}
+
+	// 获取所有菜单ID
+	var menuIDs []uint
+	if err := DB.Model(&model.Menu{}).Pluck("id", &menuIDs).Error; err != nil {
+		log.Printf("Failed to get menu ids: %v", err)
+		return
+	}
+
+	// 为超级管理员分配所有菜单权限
+	roleMenus := make([]model.RoleMenu, 0, len(menuIDs))
+	for _, menuID := range menuIDs {
+		roleMenus = append(roleMenus, model.RoleMenu{
+			RoleID: adminRole.ID,
+			MenuID: menuID,
+		})
+	}
+	if err := DB.Create(&roleMenus).Error; err != nil {
+		log.Printf("Failed to create role-menu relations: %v", err)
+		return
+	}
+
+	// 创建普通用户角色
+	userRole := model.Role{
+		Name:        "普通用户",
+		Code:        "user",
+		Description: "普通用户，拥有基本操作权限",
+		Status:      true,
+		Sort:        1,
+	}
+	if err := DB.Create(&userRole).Error; err != nil {
+		log.Printf("Failed to create user role: %v", err)
+		return
+	}
+
+	// 为普通用户分配基本菜单权限（这里假设ID为1的是首页菜单）
+	basicMenus := []model.RoleMenu{
+		{RoleID: userRole.ID, MenuID: 1}, // 首页
+	}
+	if err := DB.Create(&basicMenus).Error; err != nil {
+		log.Printf("Failed to create basic role-menu relations: %v", err)
+		return
+	}
+
+	log.Println("Roles initialized successfully")
 } 

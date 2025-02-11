@@ -30,7 +30,7 @@ func (s *MenuService) List(page, pageSize int) ([]model.Menu, int64, error) {
 }
 
 // GetMenuTree 获取菜单树
-func (s *MenuService) GetMenuTree() ([]model.Menu, error) {
+func (s *MenuService) GetMenuTree() ([]*repository.TreeNode, error) {
 	return s.menuRepo.GetMenuTree()
 }
 
@@ -85,4 +85,9 @@ func (s *MenuService) Delete(id uint) error {
 // GetVisibleMenus 获取可见菜单树
 func (s *MenuService) GetVisibleMenus() ([]model.Menu, error) {
 	return s.menuRepo.GetVisibleMenus()
+}
+
+// GetFullMenuTree 获取完整的菜单树（包括按钮）
+func (s *MenuService) GetFullMenuTree() ([]model.Menu, error) {
+	return s.menuRepo.GetFullMenuTree()
 } 

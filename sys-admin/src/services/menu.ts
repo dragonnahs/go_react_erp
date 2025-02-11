@@ -19,4 +19,9 @@ export const deleteMenu = (id: number) => {
 
 export const getMenuTree = () => {
   return request.get('/menus/tree');
-}; 
+};
+
+// 获取完整菜单树（包括按钮）
+export async function getFullMenuTree() {
+  return request.get('/menus/full-tree');
+} 

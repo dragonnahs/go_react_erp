@@ -1,4 +1,4 @@
-import { PlusOutlined }  from '@ant-design/icons';
+import Icon, { PlusOutlined }  from '@ant-design/icons';
 import { ActionType, ProColumns, ProTable } from '@ant-design/pro-components';
 import { Button, message, Modal, Space, Tag } from 'antd';
 import { useRef, useState } from 'react';
@@ -33,7 +33,7 @@ const MenuList = () => {
   const loadMenuTree = async () => {
     try {
       const res = await getMenuTree();
-      setMenuTree(res.data);
+      setMenuTree(res.data.items);
     } catch (error) {
       console.error('加载菜单树失败:', error);
     }
@@ -49,7 +49,13 @@ const MenuList = () => {
       title: '图标',
       dataIndex: 'icon',
       width: 80,
-      render: (icon: any) => icon && React.createElement(Icons[icon]),
+      render: (_, record) => {
+        if(record.icon) {
+          return React.createElement(Icons[record.icon])
+        }else {
+          return '无'
+        }
+      },
     },
     {
       title: '路由路径',
@@ -94,7 +100,8 @@ const MenuList = () => {
       width: 120,
       render: (_, record) => (
         <Space>
-          <a onClick={() => {
+          <a onClick={async () => {
+            await loadMenuTree()
             setCurrentMenu(record);
             setModalVisible(true);
           }}>编辑</a>
@@ -103,7 +110,6 @@ const MenuList = () => {
       ),
     },
   ];
-
   return (
     <>
       <ProTable<MenuItem>
@@ -118,7 +124,7 @@ const MenuList = () => {
             icon={<PlusOutlined />}
             type="primary"
             onClick={async () => {
-              await loadMenuTree();
+              await loadMenuTree()
               setCurrentMenu(undefined);
               setModalVisible(true);
             }}

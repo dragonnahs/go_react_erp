@@ -44,10 +44,10 @@ func (c *MenuController) List(ctx *gin.Context) {
 func (c *MenuController) GetMenuTree(ctx *gin.Context) {
 	menus, err := c.menuService.GetMenuTree()
 	if err != nil {
-		response.ServerError(ctx)
+		response.Error(ctx, constants.ERROR , "获取菜单树失败")
 		return
 	}
-	response.Success(ctx, menus)
+	response.Success(ctx, gin.H{"items": menus})
 }
 
 // Create 创建菜单
@@ -137,4 +137,14 @@ func (c *MenuController) GetVisibleMenus(ctx *gin.Context) {
 		return
 	}
 	response.Success(ctx, menus)
+}
+
+// GetFullMenuTree 获取完整的菜单树（包括按钮）
+func (c *MenuController) GetFullMenuTree(ctx *gin.Context) {
+	menus, err := c.menuService.GetFullMenuTree()
+	if err != nil {
+		response.Error(ctx, constants.ERROR, "获取完整菜单树失败")
+		return
+	}
+	response.Success(ctx, gin.H{"items": menus})
 } 

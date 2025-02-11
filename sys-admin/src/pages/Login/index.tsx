@@ -9,13 +9,14 @@ import {
 } from '@ant-design/pro-components';
 import { message, Tabs } from 'antd';
 import { useState } from 'react';
-import { history } from 'umi';
+import { history, useLocation } from 'umi';
 import request from '@/utils/request';
 
 type LoginType = 'login' | 'register';
 
 export default () => {
   const [loginType, setLoginType] = useState<LoginType>('login');
+  const location = useLocation();
 
   const handleSubmit = async (values: any) => {
     try {
@@ -23,14 +24,18 @@ export default () => {
       const response = await request.post(endpoint, values);
       
       // 保存token
-      localStorage.setItem('token', response.token);
+      localStorage.setItem('token', response.data.token);
       
       message.success(
         loginType === 'login' ? '登录成功！' : '注册成功！'
       );
       
-      // 跳转到首页
-      history.push('/');
+      // 获取重定向地址
+      const params = new URLSearchParams(location.search);
+      const redirect = params.get('redirect');
+      
+      // 如果有重定向地址则跳转到重定向地址，否则跳转到首页
+      history.replace(redirect || '/');
     } catch (error) {
       // 错误处理由响应拦截器统一处理
     }

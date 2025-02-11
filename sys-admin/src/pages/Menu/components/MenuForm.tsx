@@ -74,6 +74,11 @@ const MenuForm: React.FC<MenuFormProps> = ({
           treeData: menuTree,
           placeholder: '请选择上级菜单',
           allowClear: true,
+          fieldNames: {
+            label: 'name',
+            value: 'id',
+            children: 'children'
+          }
         }}
       />
       <ProFormText

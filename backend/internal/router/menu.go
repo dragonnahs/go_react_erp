@@ -16,6 +16,7 @@ func RegisterMenuRoutes(v1 *gin.RouterGroup) {
 	{
 		menuGroup.GET("", menuController.List)
 		menuGroup.GET("/tree", menuController.GetMenuTree)
+		menuGroup.GET("/full-tree", menuController.GetFullMenuTree)
 		menuGroup.GET("/visible", menuController.GetVisibleMenus)
 		menuGroup.POST("", menuController.Create)
 		menuGroup.PUT("/:id", menuController.Update)
