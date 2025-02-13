@@ -2,7 +2,7 @@
  * @Author: shanlonglong danlonglong@weimiao.cn
  * @Date: 2025-02-08 16:32:01
  * @LastEditors: shanlonglong danlonglong@weimiao.cn
- * @LastEditTime: 2025-02-13 10:36:45
+ * @LastEditTime: 2025-02-13 14:50:15
  * @FilePath: \go_react_erp\sys-admin\src\app.ts
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -11,17 +11,30 @@
 // 全局初始化数据配置，用于 Layout 用户信息和权限初始化
 // 更多信息见文档：https://umijs.org/docs/api/runtime-config#getinitialstate
 
-import { history } from 'umi';
+import { history, useModel } from 'umi';
 import AuthWrapper from './components/AuthWrapper';
 import { getCurrentUser, getUserRoutes } from '@/services/user';
 import type { CurrentUser } from '@/types/user';
-
+import type { MenuDataItem } from '@ant-design/pro-components';
+import * as Icons from '@ant-design/icons';
+import React from 'react';
 // 定义初始化状态的类型
 export interface InitialState {
   currentUser?: CurrentUser;
   loading?: boolean;
-  routes?: string[];
+  menus?: MenuDataItem[];
 }
+
+// 将后端菜单数据转换为 ProLayout 需要的格式
+const convertMenus = (menus: any[]): MenuDataItem[] => {
+  return menus.map(menu => ({
+    path: menu.path,
+    name: menu.name,
+    icon: React.createElement(Icons[menu.icon]),
+    component: menu.component,
+    routes: menu.children ? convertMenus(menu.children) : undefined,
+  }));
+};
 
 // 获取初始化状态
 export async function getInitialState(): Promise<InitialState> {
@@ -44,10 +57,9 @@ export async function getInitialState(): Promise<InitialState> {
       getCurrentUser(),
       getUserRoutes()
     ]);
-    
     return {
       currentUser: userRes.data,
-      routes: routesRes.data.routes,
+      menus: [{path: '/', name: '首页', icon: React.createElement(Icons['HomeOutlined']) , component: './Home'}, ...convertMenus(routesRes.data.routes)],
     };
   } catch (error) {
     console.error('获取用户信息失败:', error);
@@ -57,14 +69,17 @@ export async function getInitialState(): Promise<InitialState> {
   }
 }
 
-export const layout = () => {
+export const layout = ({initialState}: {initialState: InitialState}) => {
   return {
     logo: 'https://img.alicdn.com/tfs/TB1YHEpwUT1gK0jSZFhXXaAtVXa-28-27.svg',
     title: '系统管理',
     menu: {
-      locale: false,
+      // 从全局状态获取菜单数据
+      request: async () => {
+        console.log(initialState, 'initialState');
+        return initialState?.menus || [];
+      },
     },
-    layout: 'mix',
     // 可以通过 token 来控制用户访问
     logout: () => {
       localStorage.removeItem('token');
@@ -72,7 +87,7 @@ export const layout = () => {
     },
     // 自定义头像下拉菜单项
     avatarProps: {
-      render: (props: any, dom: any) => {
+      render: (_: any, dom: any) => {
         return dom;
       },
     },
