@@ -78,6 +78,9 @@ func (s *UserService) Update(user *model.User) error {
 	if user.Status != "" {
 		updates["status"] = user.Status
 	}
+	if user.RoleID != 0 {
+		updates["role_id"] = user.RoleID
+	}
 
 	return s.userRepo.Update(user.ID, updates)
 }
