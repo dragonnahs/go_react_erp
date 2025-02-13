@@ -70,8 +70,8 @@ const UserList = () => {
       valueType: 'option',
       render: (_, record) => (
         <Space>
-          <a onClick={() => {
-            setCurrentUser(record);
+          <a onClick={async () => {
+            await setCurrentUser(record);
             setModalVisible(true);
           }}>编辑</a>
           <a onClick={() => handleDelete(record.id)}>删除</a>
@@ -121,7 +121,7 @@ const UserList = () => {
         }}
         columns={columns}
       />
-      <UserForm
+      {modalVisible &&   <UserForm
         visible={modalVisible}
         onCancel={() => setModalVisible(false)}
         onSuccess={() => {
@@ -129,8 +129,8 @@ const UserList = () => {
           actionRef.current?.reload();
         }}
         record={currentUser}
-      />
-    </>
+      />}
+    </> 
   );
 };
 

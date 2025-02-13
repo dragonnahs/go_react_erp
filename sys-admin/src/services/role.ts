@@ -28,4 +28,9 @@ export async function deleteRole(id: number) {
 // 获取角色详情
 export async function getRoleById(id: number) {
   return request.get(`/roles/${id}`);
-} 
+}
+
+// 获取所有角色（不分页）
+export const getAllRoles = () => {
+  return request.get('/roles/all');
+}; 

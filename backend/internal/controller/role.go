@@ -126,4 +126,14 @@ func (c *RoleController) GetById(ctx *gin.Context) {
 	}
 
 	response.Success(ctx, role)
+}
+
+// GetAllRoles 获取所有角色（不分页）
+func (c *RoleController) GetAllRoles(ctx *gin.Context) {
+	roles, err := c.roleService.GetAll()
+	if err != nil {
+		response.Error(ctx, constants.ERROR, "获取角色列表失败")
+		return
+	}
+	response.Success(ctx, roles)
 } 

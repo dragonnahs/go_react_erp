@@ -273,3 +273,5 @@
 {"level":"info","time":"2025-02-13T12:30:11.440+0800","caller":"middleware/logger.go:20","msg":"incoming request","status":200,"method":"PUT","path":"/api/v1/users/1","query":"","ip":"::1","cost":0.1868616}
 {"level":"info","time":"2025-02-13T12:30:11.644+0800","caller":"middleware/logger.go:20","msg":"incoming request","status":200,"method":"GET","path":"/api/v1/users","query":"current=1&pageSize=20","ip":"::1","cost":0.0987465}
 {"level":"info","time":"2025-02-13T12:30:15.720+0800","caller":"middleware/logger.go:20","msg":"incoming request","status":200,"method":"GET","path":"/api/v1/users","query":"current=1&pageSize=20","ip":"::1","cost":0.0962131}
+{"level":"info","time":"2025-02-13T13:50:29.040+0800","caller":"middleware/logger.go:20","msg":"incoming request","status":200,"method":"GET","path":"/api/v1/roles/all","query":"","ip":"::1","cost":0.0005063}
+{"level":"info","time":"2025-02-13T13:55:10.814+0800","caller":"middleware/logger.go:20","msg":"incoming request","status":200,"method":"GET","path":"/api/v1/roles/all","query":"","ip":"::1","cost":0}

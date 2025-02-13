@@ -19,5 +19,6 @@ func RegisterRoleRoutes(r *gin.RouterGroup) {
 		roleRoutes.PUT("/:id", roleController.Update)     // 更新角色
 		roleRoutes.DELETE("/:id", roleController.Delete)  // 删除角色
 		roleRoutes.GET("/:id", roleController.GetById)    // 获取角色详情
+		roleRoutes.GET("/all", roleController.GetAllRoles)
 	}
 } 

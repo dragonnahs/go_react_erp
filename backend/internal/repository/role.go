@@ -155,3 +155,13 @@ func (r *RoleRepository) FindById(id uint) (*model.Role, error) {
 
 	return &role, nil
 } 
+
+// 不分页获取所有角色
+func (r *RoleRepository) FindAllRoles() ([]model.Role, error) {
+	var roles []model.Role
+	err := database.DB.Find(&roles).Error
+	if err != nil {
+		return nil, err
+	}
+	return roles, nil
+}
