@@ -11,3 +11,9 @@
 /sys-admin/dist
 /sys-admin/.mfsu
 /sys-admin/.swc
+/backend/logs
+/backend/uploads
+/backend/public/uploads
+/backend/public/uploads/*
+/backend/public/uploads/*/*
+/backend/public/uploads/*/*/*
