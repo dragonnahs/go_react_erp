@@ -36,4 +36,9 @@ export const deleteUser = (id: number) => {
 
 export const getUserById = (id: number) => {
   return request.get(`/users/${id}`);
+};
+
+// 获取当前用户信息
+export const getCurrentUser = () => {
+    return request.get('/users/current');
 }; 

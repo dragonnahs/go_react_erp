@@ -3,11 +3,10 @@ package controller
 import (
 	"erp-sys/internal/model"
 	"erp-sys/internal/service"
-	"net/http"
-	"strconv"
-
 	"erp-sys/pkg/constants"
 	"erp-sys/pkg/response"
+	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -183,6 +182,32 @@ func (c *UserController) Register(ctx *gin.Context) {
 			"email":    user.Email,
 			"role":     user.Role,
 		},
+	})
+}
+
+// GetCurrentUser 获取当前登录用户信息
+func (c *UserController) GetCurrentUser(ctx *gin.Context) {
+	// 从上下文获取当前用户ID
+	userId := ctx.GetUint("userId")
+	if userId == 0 {
+		response.Error(ctx, constants.ERROR, "未找到用户信息")
+		return
+	}
+
+	user, err := c.userService.GetById(userId)
+	if err != nil {
+		response.Error(ctx, constants.ERROR, "获取用户信息失败")
+		return
+	}
+
+	response.Success(ctx, gin.H{
+		"id":         user.ID,
+		"username":   user.Username,
+		"email":      user.Email,
+		"role":       user.Role,
+		"status":     user.Status,
+		"created_at": user.CreatedAt,
+		"updated_at": user.UpdatedAt,
 	})
 }
 
