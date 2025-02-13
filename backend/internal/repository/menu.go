@@ -296,3 +296,34 @@ func (r *MenuRepository) GetFullMenuTree() ([]model.Menu, error) {
 	return buildMenuTree(menus), nil
 }
 
+// GetMenusByRole 根据角色获取菜单权限
+func (r *MenuRepository) GetMenusByRole(roleId uint) ([]model.Menu, error) {
+	var menus []model.Menu
+
+	// 通过角色-菜单关联表获取该角色的所有菜单ID
+	var menuIds []uint
+	err := database.DB.Model(&model.RoleMenu{}).
+		Where("role_id = ?", roleId).
+		Pluck("menu_id", &menuIds).Error
+	if err != nil {
+		return nil, err
+	}
+
+	// 如果没有任何菜单权限，返回空数组
+	if len(menuIds) == 0 {
+		return []model.Menu{}, nil
+	}
+
+	// 获取可见的菜单
+	err = database.DB.Where("id IN ? AND type = ? AND visible = ?", 
+		menuIds, "menu", true).
+		Order("sort asc").
+		Find(&menus).Error
+	if err != nil {
+		return nil, err
+	}
+
+	// 构建菜单树
+	return buildMenuTree(menus), nil
+}
+

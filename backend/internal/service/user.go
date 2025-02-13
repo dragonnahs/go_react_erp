@@ -11,11 +11,13 @@ import (
 
 type UserService struct {
 	userRepo *repository.UserRepository
+	menuRepo *repository.MenuRepository
 }
 
 func NewUserService() *UserService {
 	return &UserService{
 		userRepo: repository.NewUserRepository(),
+		menuRepo: repository.NewMenuRepository(),
 	}
 }
 
@@ -72,9 +74,6 @@ func (s *UserService) Update(user *model.User) error {
 			return err
 		}
 		updates["password"] = string(hashedPassword)
-	}
-	if user.Role != "" {
-		updates["role"] = user.Role
 	}
 	if user.Status != "" {
 		updates["status"] = user.Status
@@ -146,4 +145,21 @@ func (s *UserService) Register(user *model.User) error {
 	user.Password = string(hashedPassword)
 
 	return s.userRepo.Create(user)
+}
+
+// GetUserRoutes 获取用户的路由权限
+func (s *UserService) GetUserRoutes(userId uint) ([]model.Menu, error) {
+	// 获取用户信息
+	user, err := s.userRepo.FindById(userId)
+	if err != nil {
+		return nil, err
+	}
+
+	// 根据用户的角色ID获取路由权限
+	routes, err := s.menuRepo.GetMenusByRole(user.RoleID)
+	if err != nil {
+		return nil, err
+	}
+
+	return routes, nil
 } 

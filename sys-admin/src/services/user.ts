@@ -41,4 +41,9 @@ export const getUserById = (id: number) => {
 // 获取当前用户信息
 export const getCurrentUser = () => {
     return request.get('/users/current');
+};
+
+// 获取用户路由权限
+export const getUserRoutes = () => {
+    return request.get('/users/routes');
 }; 

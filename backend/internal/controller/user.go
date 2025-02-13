@@ -157,7 +157,6 @@ func (c *UserController) Register(ctx *gin.Context) {
 		Username: registerData.Username,
 		Password: registerData.Password,
 		Email:    registerData.Email,
-		Role:     registerData.Role,
 		Status:   "active", // 默认状态为激活
 	}
 
@@ -180,7 +179,7 @@ func (c *UserController) Register(ctx *gin.Context) {
 			"id":       user.ID,
 			"username": user.Username,
 			"email":    user.Email,
-			"role":     user.Role,
+			"role_id":  user.RoleID,
 		},
 	})
 }
@@ -204,10 +203,31 @@ func (c *UserController) GetCurrentUser(ctx *gin.Context) {
 		"id":         user.ID,
 		"username":   user.Username,
 		"email":      user.Email,
-		"role":       user.Role,
+		"role_id":    user.RoleID,
 		"status":     user.Status,
 		"created_at": user.CreatedAt,
 		"updated_at": user.UpdatedAt,
+	})
+}
+
+// GetUserRoutes 获取当前用户的路由权限
+func (c *UserController) GetUserRoutes(ctx *gin.Context) {
+	// 从上下文获取当前用户ID
+	userId := ctx.GetUint("userId")
+	if userId == 0 {
+		response.Error(ctx, constants.ERROR, "未找到用户信息")
+		return
+	}
+
+	// 获取用户的路由权限
+	routes, err := c.userService.GetUserRoutes(userId)
+	if err != nil {
+		response.Error(ctx, constants.ERROR, "获取用户路由权限失败")
+		return
+	}
+
+	response.Success(ctx, gin.H{
+		"routes": routes,
 	})
 }
 

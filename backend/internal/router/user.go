@@ -25,5 +25,6 @@ func RegisterUserRoutes(v1 *gin.RouterGroup) {
 		userGroup.PUT("/:id", userController.Update)
 		userGroup.DELETE("/:id", userController.Delete)
 		userGroup.GET("/current", userController.GetCurrentUser)
+		userGroup.GET("/routes", userController.GetUserRoutes)
 	}
 } 

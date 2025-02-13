@@ -13,13 +13,14 @@
 
 import { history } from 'umi';
 import AuthWrapper from './components/AuthWrapper';
-import { getCurrentUser } from '@/services/user';
+import { getCurrentUser, getUserRoutes } from '@/services/user';
 import type { CurrentUser } from '@/types/user';
 
 // 定义初始化状态的类型
 export interface InitialState {
   currentUser?: CurrentUser;
   loading?: boolean;
+  routes?: string[];
 }
 
 // 获取初始化状态
@@ -38,10 +39,15 @@ export async function getInitialState(): Promise<InitialState> {
   }
 
   try {
-    // 获取用户信息
-    const { data } = await getCurrentUser();
+    // 获取用户信息和路由权限
+    const [userRes, routesRes] = await Promise.all([
+      getCurrentUser(),
+      getUserRoutes()
+    ]);
+    
     return {
-      currentUser: data,
+      currentUser: userRes.data,
+      routes: routesRes.data.routes,
     };
   } catch (error) {
     console.error('获取用户信息失败:', error);
