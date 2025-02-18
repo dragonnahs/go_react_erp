@@ -3,6 +3,7 @@ package repository
 import (
 	"erp-sys/internal/model"
 	"erp-sys/pkg/database"
+	"fmt"
 
 	"gorm.io/gorm"
 )
@@ -94,6 +95,12 @@ func (r *RoleRepository) Update(id uint, updates map[string]interface{}) error {
 
 		// 如果更新了菜单ID列表
 		if menuIDs, ok := updates["menu_ids"].([]uint); ok {
+			var count int64
+			err := tx.Model(&model.RoleMenu{}).Where("role_id = ?", id).Count(&count).Error
+			if err != nil {
+				return err
+			}
+			fmt.Println("Records to delete:", count, id)
 			// 删除原有的角色-菜单关联
 			if err := tx.Where("role_id = ?", id).Delete(&model.RoleMenu{}).Error; err != nil {
 				return err
