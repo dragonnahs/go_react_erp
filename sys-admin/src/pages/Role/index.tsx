@@ -69,8 +69,8 @@ const RoleList = () => {
       width: 120,
       render: (_, record) => (
         <Space>
-          <a onClick={() => {
-            setCurrentRole(record);
+          <a onClick={async () => {
+            await setCurrentRole(record);
             setModalVisible(true);
           }}>编辑</a>
           <a onClick={() => handleDelete(record.id)}>删除</a>

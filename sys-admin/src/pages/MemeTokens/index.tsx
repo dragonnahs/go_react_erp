@@ -1,7 +1,7 @@
 import { ProTable } from '@ant-design/pro-components';
 import type { ProColumns } from '@ant-design/pro-components';
-import { Tooltip, Tag, Space } from 'antd';
-import { TrendingUpOutlined, FireOutlined } from '@ant-design/icons';
+import { Tag, Space } from 'antd';
+import { FireOutlined } from '@ant-design/icons';
 
 interface MemeToken {
   rank: number;
@@ -85,7 +85,7 @@ const MemeTokenList = () => {
         <Space>
           <FireOutlined style={{ color: '#ff4d4f', fontSize: '20px' }} />
           <span>最火Meme币</span>
-          <Tag icon={<TrendingUpOutlined />} color="success">
+          <Tag color="success">
             1h 趋势
           </Tag>
         </Space>
