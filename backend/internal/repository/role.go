@@ -102,7 +102,7 @@ func (r *RoleRepository) Update(id uint, updates map[string]interface{}) error {
 			}
 			fmt.Println("Records to delete:", count, id)
 			// 删除原有的角色-菜单关联
-			if err := tx.Where("role_id = ?", id).Delete(&model.RoleMenu{}).Error; err != nil {
+			if err := tx.Unscoped().Where("role_id = ?", id).Delete(&model.RoleMenu{}).Error; err != nil {
 				return err
 			}
 
