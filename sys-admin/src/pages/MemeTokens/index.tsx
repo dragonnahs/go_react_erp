@@ -3,6 +3,7 @@ import type { ProColumns } from '@ant-design/pro-components';
 import { Tag, Space } from 'antd';
 import { FireOutlined } from '@ant-design/icons';
 import { message } from 'antd';
+import { getHotMemeTokens } from '@/services/memeToken';
 
 interface MemeToken {
   rank: number;
