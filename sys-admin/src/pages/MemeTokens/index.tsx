@@ -2,6 +2,7 @@ import { ProTable } from '@ant-design/pro-components';
 import type { ProColumns } from '@ant-design/pro-components';
 import { Tag, Space } from 'antd';
 import { FireOutlined } from '@ant-design/icons';
+import { message } from 'antd';
 
 interface MemeToken {
   rank: number;
@@ -101,27 +102,21 @@ const MemeTokenList = () => {
         pageSize: 20,
       }}
       request={async () => {
-        // 这里替换为实际的 API 调用
-        const mockData: MemeToken[] = [
-          {
-            rank: 1,
-            symbol: 'PEPE',
-            name: 'Pepe',
-            price: 0.00000123,
-            price_change_1h: 15.23,
-            volume_24h: 1234567,
-            market_cap: 98765432,
-            holders: 12345,
-            created_at: '2024-02-18T10:00:00Z',
-          },
-          // ... 更多模拟数据
-        ];
-
-        return {
-          data: mockData,
-          success: true,
-          total: mockData.length,
-        };
+        try {
+          const response = await getHotMemeTokens();
+          return {
+            data: response.data,
+            success: true,
+            total: response.data.length,
+          };
+        } catch (error) {
+          message.error('获取数据失败');
+          return {
+            data: [],
+            success: false,
+            total: 0,
+          };
+        }
       }}
       columns={columns}
     />

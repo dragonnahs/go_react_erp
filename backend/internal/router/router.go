@@ -21,6 +21,7 @@ func RegisterRoutes(r *gin.Engine) {
 	RegisterUserRoutes(v1)   // 用户模块路由
 	RegisterMenuRoutes(v1)   // 菜单模块路由
 	RegisterRoleRoutes(v1)   // 角色模块路由
+	RegisterMemeTokenRoutes(v1)
 	
 	// ... 其他模块路由注册
 } 
