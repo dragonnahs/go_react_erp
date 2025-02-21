@@ -104,7 +104,6 @@
 .phaseRow {
   border-bottom: 1px solid #f0f0f0;
   position: relative;
-  min-height: 60px;
   transition: background-color 0.3s;
   padding: 4px 0;
 
@@ -125,7 +124,6 @@
 
 .taskItem {
   position: absolute;
-  top: 8px;
   height: 44px;
   background: #fff;
   cursor: pointer;
@@ -145,6 +143,7 @@
   &.dragging {
     opacity: 0.8;
     cursor: grabbing;
+    z-index: 100;
     
     .taskCard {
       transform: scale(1.02);

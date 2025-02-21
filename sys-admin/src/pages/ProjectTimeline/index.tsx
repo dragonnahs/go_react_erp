@@ -70,16 +70,83 @@ const ProjectTimeline: React.FC = () => {
     currentDate = currentDate.add(1, 'month');
   }
 
-  // 计算任务位置
-  const getTaskPosition = (task: Task) => {
+  // 计算每个阶段的任务行数
+  const calculatePhaseRows = (tasks: Task[]) => {
+    const rows: { [key: string]: number } = {};
+    const taskPositions: { [key: string]: number } = {};
+
+    // 按开始时间排序任务
+    const sortedTasks = [...tasks].sort((a, b) => 
+      dayjs(a.startTime).diff(dayjs(b.startTime))
+    );
+
+    sortedTasks.forEach(task => {
+      const taskStart = dayjs(task.startTime);
+      const taskEnd = dayjs(task.endTime);
+      let row = 0;
+
+      // 查找可用的行
+      while (true) {
+        let canUseRow = true;
+        // 检查这一行是否有重叠的任务
+        for (const [tid, existingRow] of Object.entries(taskPositions)) {
+          if (existingRow === row) {
+            const existingTask = tasks.find(t => t.id.toString() === tid);
+            if (existingTask) {
+              const existingStart = dayjs(existingTask.startTime);
+              const existingEnd = dayjs(existingTask.endTime);
+              // 检查是否有时间重叠
+              if (!(taskStart.isAfter(existingEnd) || taskEnd.isBefore(existingStart))) {
+                canUseRow = false;
+                break;
+              }
+            }
+          }
+        }
+        if (canUseRow) break;
+        row++;
+      }
+
+      taskPositions[task.id.toString()] = row;
+      rows[task.id.toString()] = row;
+    });
+
+    return {
+      rowCount: Math.max(...Object.values(rows)) + 1,
+      taskRows: rows
+    };
+  };
+
+  // 计算任务位置（包括垂直位置）
+  const getTaskPosition = (task: Task, phaseData: any) => {
+    const { taskRows } = calculatePhaseRows(phaseData.tasks);
+    const row = taskRows[task.id.toString()];
+    const TASK_HEIGHT = 44; // 任务卡片高度
+    const TASK_MARGIN = 8; // 任务卡片间距
+
     const taskStart = dayjs(task.startTime);
     const taskEnd = dayjs(task.endTime);
     const left = (taskStart.diff(startDate, 'day') / totalDays) * 100;
     const width = Math.max(
       (taskEnd.diff(taskStart, 'day') / totalDays) * 100,
-      2 // 最小宽度百分比
+      2
     );
-    return { left: `${left}%`, width: `${width}%` };
+
+    return {
+      left: `${left}%`,
+      width: `${width}%`,
+      top: row * (TASK_HEIGHT + TASK_MARGIN) + 'px'
+    };
+  };
+
+  // 计算阶段高度
+  const getPhaseHeight = (phaseData: any) => {
+    const { rowCount } = calculatePhaseRows(phaseData.tasks);
+    const TASK_HEIGHT = 44; // 任务卡片高度
+    const TASK_MARGIN = 8; // 任务卡片间距
+    const MIN_HEIGHT = 60; // 最小高度
+    
+    return Math.max(rowCount * (TASK_HEIGHT + TASK_MARGIN) + TASK_MARGIN * 2, MIN_HEIGHT);
   };
 
   // 处理拖拽结束事件
@@ -148,7 +215,7 @@ const ProjectTimeline: React.FC = () => {
                       ref={provided.innerRef}
                       {...provided.droppableProps}
                       className={styles.phaseRow}
-                      style={{ height: PHASE_HEIGHTS[phase as ProjectPhase] }}
+                      style={{ height: getPhaseHeight(phaseData) }}
                     >
                       <div className={styles.phaseTasks}>
                         {phaseData.tasks.map((task, index) => (
@@ -164,7 +231,7 @@ const ProjectTimeline: React.FC = () => {
                                 {...provided.dragHandleProps}
                                 className={`${styles.taskItem} ${snapshot.isDragging ? styles.dragging : ''}`}
                                 style={{
-                                  ...getTaskPosition(task),
+                                  ...getTaskPosition(task, phaseData),
                                   marginLeft: '40px',
                                   ...provided.draggableProps.style,
                                 }}
