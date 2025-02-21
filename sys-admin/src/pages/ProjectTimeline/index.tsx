@@ -19,11 +19,11 @@ const getPhaseTitle = (phase: ProjectPhase) => {
 };
 
 const PHASE_HEIGHTS = {
-  preparation: 80,    // 减小每个阶段的高度
-  implementation: 80,
-  execution: 80,
-  completion: 80,
-  acceptance: 80,
+  preparation: 70,    // 减小每个阶段的高度
+  implementation: 70,
+  execution: 70,
+  completion: 70,
+  acceptance: 70,
 };
 
 const ProjectTimeline: React.FC = () => {

@@ -1,31 +1,35 @@
 .taskCard {
   height: 100%;
-  padding: 8px;
+  padding: 4px 6px;
   background: #fff;
   border: 1px solid #e8e8e8;
   border-radius: 4px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  min-width: 120px;
+  min-width: 80px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  overflow: hidden;
 
   .title {
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 500;
     color: #333;
-    margin-bottom: 8px;
+    margin-bottom: 4px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    line-height: 1.2;
   }
 
   :global(.ant-tag) {
     margin: 0;
-    padding: 0 6px;
-    line-height: 18px;
+    padding: 0 4px;
+    line-height: 16px;
+    height: 16px;
     border-radius: 2px;
-    font-size: 12px;
+    font-size: 10px;
+    display: inline-block;
   }
 }
 
