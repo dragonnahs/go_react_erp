@@ -959,3 +959,7 @@
 {"level":"info","time":"2025-02-20T16:17:07.578+0800","caller":"middleware/logger.go:20","msg":"incoming request","status":200,"method":"GET","path":"/api/v1/users/routes","query":"","ip":"127.0.0.1","cost":0.0018813}
 {"level":"info","time":"2025-02-20T16:51:17.084+0800","caller":"middleware/logger.go:20","msg":"incoming request","status":200,"method":"GET","path":"/api/v1/users/routes","query":"","ip":"127.0.0.1","cost":0.000503}
 {"level":"info","time":"2025-02-21T08:31:11.507+0800","caller":"middleware/logger.go:20","msg":"incoming request","status":200,"method":"GET","path":"/api/v1/users/routes","query":"","ip":"127.0.0.1","cost":0}
+{"level":"info","time":"2025-02-21T14:09:28.314+0800","caller":"middleware/logger.go:20","msg":"incoming request","status":200,"method":"GET","path":"/api/v1/users/routes","query":"","ip":"::1","cost":0}
+{"level":"info","time":"2025-02-21T14:09:36.138+0800","caller":"middleware/logger.go:20","msg":"incoming request","status":200,"method":"GET","path":"/api/v1/users/routes","query":"","ip":"::1","cost":0}
+{"level":"info","time":"2025-02-21T14:09:59.414+0800","caller":"middleware/logger.go:20","msg":"incoming request","status":200,"method":"GET","path":"/api/v1/users/routes","query":"","ip":"::1","cost":0}
+{"level":"info","time":"2025-02-21T14:16:15.749+0800","caller":"middleware/logger.go:20","msg":"incoming request","status":200,"method":"GET","path":"/api/v1/users/routes","query":"","ip":"::1","cost":0}

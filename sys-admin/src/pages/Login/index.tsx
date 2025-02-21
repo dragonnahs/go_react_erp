@@ -36,6 +36,7 @@ export default () => {
       
       // 如果有重定向地址则跳转到重定向地址，否则跳转到首页
       history.replace(redirect || '/');
+      window.location.reload();
     } catch (error) {
       // 错误处理由响应拦截器统一处理
     }
