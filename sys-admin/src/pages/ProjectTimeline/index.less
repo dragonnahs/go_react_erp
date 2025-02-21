@@ -141,6 +141,24 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     z-index: 2;
   }
+
+  &.dragging {
+    opacity: 0.8;
+    cursor: grabbing;
+    
+    .taskCard {
+      transform: scale(1.02);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+  }
+}
+
+.taskCard {
+  cursor: grab;
+  
+  &:active {
+    cursor: grabbing;
+  }
 }
 
 .scrollContainer {

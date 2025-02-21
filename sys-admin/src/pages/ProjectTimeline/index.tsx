@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { message } from 'antd';
 import dayjs from 'dayjs';
-import { getProject } from '@/services/project';
+import { getProject, updateTaskPosition } from '@/services/project';
 import type { Project, Task, ProjectPhase } from '@/types/project';
 import TaskCard from './components/TaskCard';
 import TaskDetail from './components/TaskDetail';
 import styles from './index.less';
+import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
 
 const getPhaseTitle = (phase: ProjectPhase) => {
   const titles = {
@@ -81,67 +82,112 @@ const ProjectTimeline: React.FC = () => {
     return { left: `${left}%`, width: `${width}%` };
   };
 
+  // 处理拖拽结束事件
+  const handleDragEnd = async (result: any) => {
+    if (!result.destination || !project) return;
+
+    const { draggableId, destination } = result;
+    const taskId = parseInt(draggableId);
+    const newPhase = destination.droppableId as ProjectPhase;
+    const newOrder = destination.index;
+
+    try {
+      await updateTaskPosition({
+        taskId,
+        newPhase,
+        newOrder,
+      });
+      message.success('更新任务位置成功');
+      fetchProjectData();
+    } catch (error) {
+      message.error('更新任务位置失败');
+    }
+  };
+
   return (
     <div className={styles.container}>
-      <div className={styles.timelineWrapper}>
-        {/* 固定的阶段标签列 */}
-        <div className={styles.phaseLabels}>
-          <div className={styles.headerPlaceholder} />
-          {Object.entries(project.phases).map(([phase]) => (
-            <div key={phase} className={styles.phaseLabel}>
-              {getPhaseTitle(phase as ProjectPhase)}
-            </div>
-          ))}
-        </div>
-
-        {/* 可滚动的内容区域 */}
-        <div className={styles.scrollContainer}>
-          {/* 时间轴标尺 */}
-          <div className={styles.timelineHeader} style={{ width: getTimelineWidth() }}>
-            <div className={styles.monthMarkers}>
-              {months.map(({ month, left }) => (
-                <div
-                  key={month}
-                  className={styles.monthMarker}
-                  style={{ left: `${left}%` }}
-                >
-                  {month}
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* 任务区域 */}
-          <div className={styles.timelineContent} style={{ width: getTimelineWidth() }}>
-            {Object.entries(project.phases).map(([phase, phaseData]) => (
-              <div
-                key={phase}
-                className={styles.phaseRow}
-                style={{ height: PHASE_HEIGHTS[phase as ProjectPhase] }}
-              >
-                <div className={styles.phaseTasks}>
-                  {phaseData.tasks.map(task => (
-                    <div
-                      key={task.id}
-                      className={styles.taskItem}
-                      style={{
-                        ...getTaskPosition(task),
-                        marginLeft: '40px', // 为任务添加左边距
-                      }}
-                      onClick={() => {
-                        setSelectedTask(task);
-                        setDetailVisible(true);
-                      }}
-                    >
-                      <TaskCard task={task} />
-                    </div>
-                  ))}
-                </div>
+      <DragDropContext onDragEnd={handleDragEnd}>
+        <div className={styles.timelineWrapper}>
+          {/* 固定的阶段标签列 */}
+          <div className={styles.phaseLabels}>
+            <div className={styles.headerPlaceholder} />
+            {Object.entries(project.phases).map(([phase]) => (
+              <div key={phase} className={styles.phaseLabel}>
+                {getPhaseTitle(phase as ProjectPhase)}
               </div>
             ))}
           </div>
+
+          {/* 可滚动的内容区域 */}
+          <div className={styles.scrollContainer}>
+            {/* 时间轴标尺 */}
+            <div className={styles.timelineHeader} style={{ width: getTimelineWidth() }}>
+              <div className={styles.monthMarkers}>
+                {months.map(({ month, left }) => (
+                  <div
+                    key={month}
+                    className={styles.monthMarker}
+                    style={{ left: `${left}%` }}
+                  >
+                    {month}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* 任务区域 */}
+            <div className={styles.timelineContent} style={{ width: getTimelineWidth() }}>
+              {Object.entries(project.phases).map(([phase, phaseData]) => (
+                <Droppable
+                  key={phase}
+                  droppableId={phase}
+                  direction="horizontal"
+                >
+                  {(provided) => (
+                    <div
+                      ref={provided.innerRef}
+                      {...provided.droppableProps}
+                      className={styles.phaseRow}
+                      style={{ height: PHASE_HEIGHTS[phase as ProjectPhase] }}
+                    >
+                      <div className={styles.phaseTasks}>
+                        {phaseData.tasks.map((task, index) => (
+                          <Draggable
+                            key={task.id}
+                            draggableId={task.id.toString()}
+                            index={index}
+                          >
+                            {(provided, snapshot) => (
+                              <div
+                                ref={provided.innerRef}
+                                {...provided.draggableProps}
+                                {...provided.dragHandleProps}
+                                className={`${styles.taskItem} ${snapshot.isDragging ? styles.dragging : ''}`}
+                                style={{
+                                  ...getTaskPosition(task),
+                                  marginLeft: '40px',
+                                  ...provided.draggableProps.style,
+                                }}
+                                onClick={() => {
+                                  setSelectedTask(task);
+                                  setDetailVisible(true);
+                                }}
+                              >
+                                <TaskCard task={task} />
+                              </div>
+                            )}
+                          </Draggable>
+                        ))}
+                        {provided.placeholder}
+                      </div>
+                    </div>
+                  )}
+                </Droppable>
+              ))}
+            </div>
+          </div>
         </div>
-      </div>
+      </DragDropContext>
 
       <TaskDetail
         visible={detailVisible}
