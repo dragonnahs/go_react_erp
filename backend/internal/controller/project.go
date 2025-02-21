@@ -5,6 +5,7 @@ import (
 	"erp-sys/internal/service"
 	"erp-sys/pkg/response"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -27,11 +28,31 @@ func (c *ProjectController) GetCurrentProject(ctx *gin.Context) {
 		return
 	}
 
-	// 按阶段组织任务数据
+	// 格式化时间为ISO格式字符串
+	formatTime := func(t time.Time) string {
+		return t.Format("2006-01-02")
+	}
+
+	// 格式化任务数据
+	formattedTasks := make([]map[string]interface{}, 0)
+	for _, task := range project.Tasks {
+		formattedTasks = append(formattedTasks, map[string]interface{}{
+			"id":          task.ID,
+			"title":       task.Title,
+			"description": task.Description,
+			"startTime":   formatTime(task.StartTime),
+			"endTime":     formatTime(task.EndTime),
+			"phase":       task.Phase,
+			"status":      task.Status,
+			"order":       task.Order,
+		})
+	}
+
+	// 按阶段组织数据
 	phases := make(map[model.Phase]struct {
-		StartDate string      `json:"start_date"`
-		EndDate   string      `json:"end_date"`
-		Tasks     []model.Task `json:"tasks"`
+		StartDate string                   `json:"startDate"`
+		EndDate   string                   `json:"endDate"`
+		Tasks     []map[string]interface{} `json:"tasks"`
 	})
 
 	// 初始化所有阶段
@@ -45,28 +66,29 @@ func (c *ProjectController) GetCurrentProject(ctx *gin.Context) {
 
 	for _, phase := range allPhases {
 		phases[phase] = struct {
-			StartDate string      `json:"start_date"`
-			EndDate   string      `json:"end_date"`
-			Tasks     []model.Task `json:"tasks"`
+			StartDate string                   `json:"startDate"`
+			EndDate   string                   `json:"endDate"`
+			Tasks     []map[string]interface{} `json:"tasks"`
 		}{
-			StartDate: project.StartDate.Format("2006-01-02"),
-			EndDate:   project.EndDate.Format("2006-01-02"),
-			Tasks:     []model.Task{},
+			StartDate: formatTime(project.StartDate),
+			EndDate:   formatTime(project.EndDate),
+			Tasks:     []map[string]interface{}{},
 		}
 	}
 
 	// 将任务按阶段分组
-	for _, task := range project.Tasks {
-		phaseData := phases[task.Phase]
+	for _, task := range formattedTasks {
+		phase := task["phase"].(model.Phase)
+		phaseData := phases[phase]
 		phaseData.Tasks = append(phaseData.Tasks, task)
-		phases[task.Phase] = phaseData
+		phases[phase] = phaseData
 	}
 
 	response.Success(ctx, gin.H{
 		"id":        project.ID,
 		"name":      project.Name,
-		"startDate": project.StartDate.Format("2006-01-02"),
-		"endDate":   project.EndDate.Format("2006-01-02"),
+		"startDate": formatTime(project.StartDate),
+		"endDate":   formatTime(project.EndDate),
 		"phases":    phases,
 	})
 }

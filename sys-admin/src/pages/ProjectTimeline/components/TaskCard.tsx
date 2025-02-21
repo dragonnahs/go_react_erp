@@ -1,6 +1,6 @@
 import React from 'react';
-import { Card, Tag } from 'antd';
-import type { TaskCard as TaskCardType } from '@/types/project';
+import { Tag, Tooltip } from 'antd';
+import type { TaskCardType } from '@/types/project';
 import styles from './TaskCard.less';
 
 interface TaskCardProps {
@@ -16,15 +16,14 @@ const statusColors = {
 
 const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
   return (
-    <Card className={styles.taskCard} size="small">
-      <div className={styles.title}>{task.title}</div>
-      <div className={styles.dates}>
-        {task.startTime} ~ {task.endTime}
+    <Tooltip title={`${task.title} (${task.startTime} ~ ${task.endTime})`}>
+      <div className={styles.taskCard}>
+        <div className={styles.title}>{task.title}</div>
+        <Tag color={statusColors[task.status]}>
+          {task.status}
+        </Tag>
       </div>
-      <Tag color={statusColors[task.status]}>
-        {task.status}
-      </Tag>
-    </Card>
+    </Tooltip>
   );
 };
 
