@@ -14,8 +14,8 @@ func main() {
 	database.Init()
 	
 	// 初始化基础数据
-	// database.SeedData()
-	// database.InitRoles()
+	database.SeedData()
+	database.InitProjectData()
 
 	// ... 其他代码 ...
 

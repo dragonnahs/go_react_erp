@@ -53,6 +53,8 @@ func Init() {
 		&model.Menu{},
 		&model.Role{},
 		&model.RoleMenu{},
+		&model.Project{},
+		&model.Task{},
 	)
 	if err != nil {
 		logger.Log.Fatal("Failed to auto migrate database", zap.Error(err))
