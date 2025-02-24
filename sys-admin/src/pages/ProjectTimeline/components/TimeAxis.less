@@ -1,27 +1,113 @@
 .timeAxis {
   position: relative;
-  height: 60px;
+  height: 40px;
   border-bottom: 1px solid #e8e8e8;
+  background: #fafafa;
 }
 
-.yearMarks {
+.marks {
   position: relative;
-  height: 30px;
+  height: 100%;
+}
+
+.mark {
+  position: absolute;
+  transform: translateX(-50%);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  .markLine {
+    width: 1px;
+    height: 20px;
+    background-color: #d9d9d9;
+    margin-top: auto;
+  }
+
+  .markLabel {
+    padding: 4px 8px;
+    font-size: 12px;
+    color: #666;
+    white-space: nowrap;
+  }
+}
+
+.markLabel {
+  padding: 2px 4px;
+  font-size: 12px;
+  color: #666;
+  white-space: nowrap;
+}
+
+.monthMark {
+  .markLine {
+    background-color: #999;
+  }
+
+  .markLabel {
+    color: #333;
+    font-weight: 500;
+  }
+}
+
+.dayMark {
+  .markLabel {
+    font-size: 11px;
+  }
 }
 
 .monthMarks {
   position: relative;
   height: 30px;
-}
-
-.yearMark {
-  position: absolute;
-  transform: translateX(-50%);
-  font-weight: bold;
+  border-bottom: 1px solid #f0f0f0;
 }
 
 .monthMark {
   position: absolute;
   transform: translateX(-50%);
-  color: #666;
+  font-weight: 500;
+  font-size: 12px;
+  color: #333;
+  top: 4px;
+}
+
+.dayMarks {
+  position: relative;
+  height: 30px;
+}
+
+.dayTick {
+  position: absolute;
+  transform: translateX(-50%);
+  bottom: 0;
+  width: 1px;
+  height: 8px;
+  background: #ccc;
+
+  &::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 1px;
+    height: 12px;
+    background: #999;
+  }
+}
+
+.dayLabel {
+  position: absolute;
+  transform: translateX(-50%);
+  font-size: 10px;
+  color: #999;
+  bottom: 14px;
+  white-space: nowrap;
+  display: none;
+}
+
+.dayTick:hover {
+  .dayLabel {
+    display: block;
+  }
 } 

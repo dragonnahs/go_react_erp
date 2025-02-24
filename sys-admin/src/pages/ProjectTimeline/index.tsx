@@ -7,7 +7,7 @@ import TaskCard from './components/TaskCard';
 import TaskDetail from './components/TaskDetail';
 import styles from './index.less';
 import { DragDropContext, Draggable, Droppable, DropResult } from '@hello-pangea/dnd';
-
+import TimeAxis from './components/TimeAxis';
 const getPhaseTitle = (phase: ProjectPhase) => {
   const titles = {
     preparation: '项目准备',
@@ -19,22 +19,16 @@ const getPhaseTitle = (phase: ProjectPhase) => {
   return titles[phase];
 };
 
-const PHASE_HEIGHTS = {
-  preparation: 70,    // 减小每个阶段的高度
-  implementation: 70,
-  execution: 70,
-  completion: 70,
-  acceptance: 70,
-};
+interface DraggingTask {
+  id: string;
+  position: { x: number; y: number };
+}
 
 const ProjectTimeline: React.FC = () => {
   const [project, setProject] = useState<Project>();
   const [selectedTask, setSelectedTask] = useState<Task>();
   const [detailVisible, setDetailVisible] = useState(false);
-  const [draggingTask, setDraggingTask] = useState<{
-    id: string;
-    position: { x: number; y: number };
-  } | null>(null);
+  const [draggingTask, setDraggingTask] = useState<DraggingTask | null>(null);
 
   const fetchProjectData = async () => {
     try {
@@ -122,7 +116,7 @@ const ProjectTimeline: React.FC = () => {
   };
 
   // 计算任务位置（包括垂直位置）
-  const getTaskPosition = (task: Task, phaseData: any) => {
+  const getTaskPosition = (task: Task, phaseData: any): React.CSSProperties => {
     // 如果任务正在拖拽中，使用拖拽位置
     if (draggingTask && draggingTask.id === task.id.toString()) {
       return {
@@ -130,7 +124,7 @@ const ProjectTimeline: React.FC = () => {
         top: draggingTask.position.y + 'px',
         width: `${Math.max((dayjs(task.endTime).diff(dayjs(task.startTime), 'day') / totalDays) * 100, 2)}%`,
         position: 'absolute',
-      };
+      } as React.CSSProperties;
     }
 
     // 常规位置计算保持不变
@@ -145,11 +139,11 @@ const ProjectTimeline: React.FC = () => {
     const width = Math.max((taskEnd.diff(taskStart, 'day') / totalDays) * 100, 2);
 
     return {
-      left: `${left}%`,
-      width: `${width}%`,
-      top: row * (TASK_HEIGHT + TASK_MARGIN) + 'px',
       position: 'absolute',
-    };
+      left: `${left}%`,
+      top: row * (TASK_HEIGHT + TASK_MARGIN) + 'px',
+      width: `${width}%`,
+    } as React.CSSProperties;
   };
 
   // 计算阶段高度
@@ -200,23 +194,25 @@ const ProjectTimeline: React.FC = () => {
     if (!scrollContainer) return;
 
     try {
-      // 获取容器宽度和滚动位置
-      const containerWidth = scrollContainer.clientWidth;
-      const scrollLeft = scrollContainer.scrollLeft;
-      
-      // 获取拖拽位置相对于容器的位置
+      const totalWidth = scrollContainer.scrollWidth;
       const dropX = (result.destination as any).x || 0;
-      const relativeX = dropX + scrollLeft;
+      const scrollLeft = scrollContainer.scrollLeft;
+      const absoluteX = dropX + scrollLeft;
       
       // 计算相对位置百分比
-      const percentage = Math.max(0, Math.min(1, relativeX / containerWidth));
+      const percentage = absoluteX / totalWidth;
       
       // 计算新的开始日期
       const startDate = dayjs(project.startDate);
       const endDate = dayjs(project.endDate);
-      const totalDays = endDate.diff(startDate, 'day');
-      const daysFromStart = Math.floor(percentage * totalDays);
-      const newStartDate = startDate.add(daysFromStart, 'day');
+      const totalMonths = endDate.diff(startDate, 'month');
+      const monthsFromStart = Math.round(percentage * totalMonths);
+      const newStartDate = startDate.add(monthsFromStart, 'month');
+
+      if (newStartDate.isAfter(endDate)) {
+        message.warning('任务不能超出项目结束时间');
+        return;
+      }
 
       await updateTaskPosition({
         taskId: parseInt(taskId),
@@ -256,7 +252,7 @@ const ProjectTimeline: React.FC = () => {
             {/* 时间轴标尺 */}
             <div className={styles.timelineHeader} style={{ width: getTimelineWidth() }}>
               <div className={styles.monthMarkers}>
-                {months.map(({ month, left }) => (
+                {/* {months.map(({ month, left }) => (
                   <div
                     key={month}
                     className={styles.monthMarker}
@@ -264,7 +260,8 @@ const ProjectTimeline: React.FC = () => {
                   >
                     {month}
                   </div>
-                ))}
+                ))} */}
+                <TimeAxis project={project} />
               </div>
             </div>
 
