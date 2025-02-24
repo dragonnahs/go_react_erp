@@ -97,8 +97,8 @@ func (c *ProjectController) GetCurrentProject(ctx *gin.Context) {
 func (c *ProjectController) UpdateTaskPosition(ctx *gin.Context) {
 	taskID, _ := strconv.ParseUint(ctx.Param("taskId"), 10, 32)
 	var req struct {
-		NewPhase string `json:"newPhase"`
-		NewOrder int    `json:"newOrder"`
+		NewPhase    string `json:"newPhase"`
+		NewStartDate string `json:"newStartDate"`
 	}
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -106,7 +106,14 @@ func (c *ProjectController) UpdateTaskPosition(ctx *gin.Context) {
 		return
 	}
 
-	err := c.projectService.UpdateTaskPosition(uint(taskID), model.Phase(req.NewPhase), req.NewOrder)
+	// 解析日期
+	newStartDate, err := time.Parse("2006-01-02", req.NewStartDate)
+	if err != nil {
+		response.Error(ctx, 400, "无效的日期格式")
+		return
+	}
+
+	err = c.projectService.UpdateTaskPosition(uint(taskID), model.Phase(req.NewPhase), newStartDate)
 	if err != nil {
 		response.Error(ctx, 500, "更新任务位置失败")
 		return

@@ -3,6 +3,7 @@ package service
 import (
 	"erp-sys/internal/model"
 	"erp-sys/internal/repository"
+	"time"
 )
 
 type ProjectService struct {
@@ -21,8 +22,8 @@ func (s *ProjectService) GetCurrentProject() (*model.Project, error) {
 }
 
 // UpdateTaskPosition 更新任务位置
-func (s *ProjectService) UpdateTaskPosition(taskID uint, phase model.Phase, order int) error {
-	return s.projectRepo.UpdateTaskPosition(taskID, phase, order)
+func (s *ProjectService) UpdateTaskPosition(taskID uint, phase model.Phase, newStartDate time.Time) error {
+	return s.projectRepo.UpdateTaskPosition(taskID, phase, newStartDate)
 }
 
 // UpdateTaskStatus 更新任务状态

@@ -18,13 +18,13 @@ export const getProject = (id?: string) => {
 export const updateTaskPosition = (params: {
   taskId: number;
   newPhase: string;
-  newOrder: number;
+  newStartDate: string;
 }) => {
   return request(`/tasks/${params.taskId}/position`, {
     method: 'PUT',
     data: {
       newPhase: params.newPhase,
-      newOrder: params.newOrder,
+      newStartDate: params.newStartDate,
     },
   });
 };

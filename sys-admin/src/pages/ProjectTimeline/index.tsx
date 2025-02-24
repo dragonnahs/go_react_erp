@@ -6,7 +6,7 @@ import type { Project, Task, ProjectPhase } from '@/types/project';
 import TaskCard from './components/TaskCard';
 import TaskDetail from './components/TaskDetail';
 import styles from './index.less';
-import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
+import { DragDropContext, Draggable, Droppable, DropResult } from '@hello-pangea/dnd';
 
 const getPhaseTitle = (phase: ProjectPhase) => {
   const titles = {
@@ -31,6 +31,10 @@ const ProjectTimeline: React.FC = () => {
   const [project, setProject] = useState<Project>();
   const [selectedTask, setSelectedTask] = useState<Task>();
   const [detailVisible, setDetailVisible] = useState(false);
+  const [draggingTask, setDraggingTask] = useState<{
+    id: string;
+    position: { x: number; y: number };
+  } | null>(null);
 
   const fetchProjectData = async () => {
     try {
@@ -119,23 +123,32 @@ const ProjectTimeline: React.FC = () => {
 
   // 计算任务位置（包括垂直位置）
   const getTaskPosition = (task: Task, phaseData: any) => {
+    // 如果任务正在拖拽中，使用拖拽位置
+    if (draggingTask && draggingTask.id === task.id.toString()) {
+      return {
+        left: draggingTask.position.x + 'px',
+        top: draggingTask.position.y + 'px',
+        width: `${Math.max((dayjs(task.endTime).diff(dayjs(task.startTime), 'day') / totalDays) * 100, 2)}%`,
+        position: 'absolute',
+      };
+    }
+
+    // 常规位置计算保持不变
     const { taskRows } = calculatePhaseRows(phaseData.tasks);
     const row = taskRows[task.id.toString()];
-    const TASK_HEIGHT = 44; // 任务卡片高度
-    const TASK_MARGIN = 8; // 任务卡片间距
+    const TASK_HEIGHT = 44;
+    const TASK_MARGIN = 8;
 
     const taskStart = dayjs(task.startTime);
     const taskEnd = dayjs(task.endTime);
     const left = (taskStart.diff(startDate, 'day') / totalDays) * 100;
-    const width = Math.max(
-      (taskEnd.diff(taskStart, 'day') / totalDays) * 100,
-      2
-    );
+    const width = Math.max((taskEnd.diff(taskStart, 'day') / totalDays) * 100, 2);
 
     return {
       left: `${left}%`,
       width: `${width}%`,
-      top: row * (TASK_HEIGHT + TASK_MARGIN) + 'px'
+      top: row * (TASK_HEIGHT + TASK_MARGIN) + 'px',
+      position: 'absolute',
     };
   };
 
@@ -149,31 +162,84 @@ const ProjectTimeline: React.FC = () => {
     return Math.max(rowCount * (TASK_HEIGHT + TASK_MARGIN) + TASK_MARGIN * 2, MIN_HEIGHT);
   };
 
-  // 处理拖拽结束事件
-  const handleDragEnd = async (result: any) => {
-    if (!result.destination || !project) return;
+  // 处理拖拽中的位置更新
+  const handleDragUpdate = (update: any) => {
+    if (!update.destination || !update.draggableId) return;
 
-    const { draggableId, destination } = result;
-    const taskId = parseInt(draggableId);
-    const newPhase = destination.droppableId as ProjectPhase;
-    const newOrder = destination.index;
+    const scrollContainer = document.querySelector(`.${styles.scrollContainer}`);
+    if (!scrollContainer) return;
+
+    const containerRect = scrollContainer.getBoundingClientRect();
+    const x = update.destination.x - containerRect.left + scrollContainer.scrollLeft;
+    const y = update.destination.y - containerRect.top;
+
+    setDraggingTask({
+      id: update.draggableId,
+      position: { x, y },
+    });
+  };
+   // 添加 findTask 辅助函数
+  const findTask = (taskId: string): Task | undefined => {
+    if (!project) return undefined;
+    for (const phase of Object.values(project.phases)) {
+      const task = phase.tasks.find(t => t.id === taskId);
+      if (task) return task;
+    }
+    return undefined;
+  };
+
+  // 处理拖拽结束
+  const handleDragEnd = async (result: DropResult) => {
+    if (!result.destination || !project) return;
+    setDraggingTask(null);
+
+    const taskId = result.draggableId;
+    const newPhase = result.destination.droppableId as ProjectPhase;
+    
+    const scrollContainer = document.querySelector(`.${styles.scrollContainer}`);
+    if (!scrollContainer) return;
 
     try {
+      // 获取容器宽度和滚动位置
+      const containerWidth = scrollContainer.clientWidth;
+      const scrollLeft = scrollContainer.scrollLeft;
+      
+      // 获取拖拽位置相对于容器的位置
+      const dropX = (result.destination as any).x || 0;
+      const relativeX = dropX + scrollLeft;
+      
+      // 计算相对位置百分比
+      const percentage = Math.max(0, Math.min(1, relativeX / containerWidth));
+      
+      // 计算新的开始日期
+      const startDate = dayjs(project.startDate);
+      const endDate = dayjs(project.endDate);
+      const totalDays = endDate.diff(startDate, 'day');
+      const daysFromStart = Math.floor(percentage * totalDays);
+      const newStartDate = startDate.add(daysFromStart, 'day');
+
       await updateTaskPosition({
-        taskId,
+        taskId: parseInt(taskId),
         newPhase,
-        newOrder,
+        newStartDate: newStartDate.format('YYYY-MM-DD'),
       });
+
       message.success('更新任务位置成功');
       fetchProjectData();
     } catch (error) {
       message.error('更新任务位置失败');
+      console.error('Error updating task position:', error);
     }
   };
 
+ 
+
   return (
     <div className={styles.container}>
-      <DragDropContext onDragEnd={handleDragEnd}>
+      <DragDropContext 
+        onDragEnd={handleDragEnd}
+        onDragUpdate={handleDragUpdate}
+      >
         <div className={styles.timelineWrapper}>
           {/* 固定的阶段标签列 */}
           <div className={styles.phaseLabels}>
