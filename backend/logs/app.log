@@ -1072,3 +1072,10 @@
 {"level":"info","time":"2025-02-21T16:52:51.695+0800","caller":"middleware/logger.go:20","msg":"incoming request","status":200,"method":"GET","path":"/api/v1/users/current","query":"","ip":"::1","cost":0.0818311}
 {"level":"info","time":"2025-02-21T16:52:51.794+0800","caller":"middleware/logger.go:20","msg":"incoming request","status":200,"method":"GET","path":"/api/v1/users/routes","query":"","ip":"::1","cost":0.1802115}
 {"level":"info","time":"2025-02-21T16:52:52.418+0800","caller":"middleware/logger.go:20","msg":"incoming request","status":200,"method":"GET","path":"/api/v1/projects/current","query":"","ip":"::1","cost":0.1101859}
+{"level":"info","time":"2025-02-21T16:57:52.269+0800","caller":"middleware/logger.go:20","msg":"incoming request","status":200,"method":"GET","path":"/api/v1/projects/current","query":"","ip":"::1","cost":0.1107772}
+{"level":"info","time":"2025-02-21T16:57:52.401+0800","caller":"middleware/logger.go:20","msg":"incoming request","status":200,"method":"GET","path":"/api/v1/projects/current","query":"","ip":"::1","cost":0.1079575}
+{"level":"info","time":"2025-02-21T16:58:21.700+0800","caller":"middleware/logger.go:20","msg":"incoming request","status":200,"method":"GET","path":"/api/v1/projects/current","query":"","ip":"::1","cost":0.120202}
+{"level":"info","time":"2025-02-21T16:58:41.611+0800","caller":"middleware/logger.go:20","msg":"incoming request","status":200,"method":"PUT","path":"/api/v1/tasks/9/position","query":"","ip":"::1","cost":0.1412318}
+{"level":"info","time":"2025-02-21T16:58:41.756+0800","caller":"middleware/logger.go:20","msg":"incoming request","status":200,"method":"GET","path":"/api/v1/projects/current","query":"","ip":"::1","cost":0.1325067}
+{"level":"info","time":"2025-02-21T16:58:49.061+0800","caller":"middleware/logger.go:20","msg":"incoming request","status":200,"method":"PUT","path":"/api/v1/tasks/9/position","query":"","ip":"::1","cost":0.1331706}
+{"level":"info","time":"2025-02-21T16:58:49.224+0800","caller":"middleware/logger.go:20","msg":"incoming request","status":200,"method":"GET","path":"/api/v1/projects/current","query":"","ip":"::1","cost":0.1346606}
