@@ -328,8 +328,8 @@ const ProjectTimeline: React.FC = () => {
                             );
                           }
 
-                          // 向右连接
-                          if (columnIndex < taskColumns.length - 1) {
+                          // 只在第一行添加向右的箭头
+                          if (rowIndex === 0 && columnIndex < taskColumns.length - 1) {
                             arrows.push(
                               <TaskArrow
                                 key={`right-${task.id}`}
