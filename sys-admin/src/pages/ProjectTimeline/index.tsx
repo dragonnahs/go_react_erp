@@ -17,7 +17,7 @@ const PHASE_TITLES = {
 
 const TASK_WIDTH = 160;
 const TASK_HEIGHT = 80;
-const TASK_MARGIN = 10;
+const TASK_SPACING = 20;
 
 type PhaseKey = keyof typeof PHASE_TITLES;
 
@@ -59,6 +59,54 @@ const ProjectTimeline: React.FC = () => {
     );
   };
 
+  // 修改计算任务布局的函数
+  const calculateTaskLayout = (tasks: Task[]) => {
+    const columns: Task[][] = [];
+    
+    // 按开始时间排序
+    const sortedTasks = [...tasks].sort((a, b) => 
+      dayjs(a.startTime).diff(dayjs(b.startTime))
+    );
+
+    sortedTasks.forEach(task => {
+      const taskStart = dayjs(task.startTime);
+      const taskEnd = dayjs(task.endTime);
+      let columnIndex = 0;
+      let placed = false;
+
+      // 先检查是否有重叠的列
+      for (let i = 0; i < columns.length; i++) {
+        const column = columns[i];
+        const hasOverlap = column.some(existingTask => {
+          const existingStart = dayjs(existingTask.startTime);
+          const existingEnd = dayjs(existingTask.endTime);
+          return !(taskEnd.isBefore(existingStart) || taskStart.isAfter(existingEnd));
+        });
+
+        if (hasOverlap) {
+          columnIndex = i;
+          placed = true;
+          break;
+        }
+      }
+
+      // 如果没有重叠，找到第一个可用的列
+      if (!placed) {
+        columnIndex = columns.length;
+      }
+
+      // 确保列存在
+      if (!columns[columnIndex]) {
+        columns[columnIndex] = [];
+      }
+
+      // 添加任务到列
+      columns[columnIndex].push(task);
+    });
+
+    return columns;
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.timeline}>
@@ -77,19 +125,36 @@ const ProjectTimeline: React.FC = () => {
                 {PHASE_TITLES[phaseKey]}
               </div>
               <div className={styles.phaseContent}>
-                {phaseTasks.map((task, index) => (
-                  <div 
-                    key={task.id}
-                    className={styles.taskItem}
-                    style={{
-                      width: TASK_WIDTH,
-                      height: TASK_HEIGHT,
-                      marginBottom: TASK_MARGIN
-                    }}
-                  >
-                    <TaskCard task={task} />
-                  </div>
-                ))}
+                {(() => {
+                  const taskColumns = calculateTaskLayout(phaseTasks);
+                  return taskColumns.map((column, columnIndex) => (
+                    <div 
+                      key={columnIndex} 
+                      className={styles.taskColumn}
+                      style={{ 
+                        position: 'absolute',
+                        left: columnIndex * (TASK_WIDTH + TASK_SPACING),
+                        top: 0,
+                        height: '100%'
+                      }}
+                    >
+                      {column.map((task, rowIndex) => (
+                        <div 
+                          key={task.id}
+                          className={styles.taskItem}
+                          style={{
+                            width: TASK_WIDTH,
+                            height: TASK_HEIGHT,
+                            position: 'absolute',
+                            top: rowIndex * (TASK_HEIGHT + TASK_SPACING)
+                          }}
+                        >
+                          <TaskCard task={task} />
+                        </div>
+                      ))}
+                    </div>
+                  ));
+                })()}
               </div>
             </div>
           );
