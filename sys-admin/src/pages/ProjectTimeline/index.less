@@ -1,139 +1,126 @@
 .container {
-  padding: 24px;
+  padding: 20px;
   background: #fff;
-  // height: calc(100vh - 150px);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-
-.timelineWrapper {
-  display: flex;
-  flex: 1;
-  min-height: 400px;
-  margin-bottom: 16px;
-  border: 1px solid #f0f0f0;
-  border-radius: 4px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
   overflow: hidden;
 }
 
-.phaseLabels {
-  width: 120px;
-  flex-shrink: 0;
-  background: #fafafa;
-  border-right: 1px solid #f0f0f0;
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
-}
+.timeline {
+  position: relative;
+  overflow: auto;
 
-.headerPlaceholder {
-  height: 40px;
-  border-bottom: 1px solid #f0f0f0;
-  background: #f7f7f7;
-}
+  &::-webkit-scrollbar {
+    height: 8px;
+  }
 
-.phaseLabel {
-  height: 70px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 8px;
-  border-bottom: 1px solid #f0f0f0;
-  font-weight: 500;
-  color: #333;
-  transition: background-color 0.3s;
+  &::-webkit-scrollbar-track {
+    background: #f5f5f5;
+    border-radius: 4px;
+  }
 
-  &:hover {
-    background: #f0f0f0;
+  &::-webkit-scrollbar-thumb {
+    background: #ddd;
+    border-radius: 4px;
+
+    &:hover {
+      background: #ccc;
+    }
   }
 }
 
-.scrollContainer {
-  flex: 1;
-  overflow: auto;
-  position: relative;
-  padding-left: 40px;
-  background: #fff;
-}
-
 .timelineHeader {
-  height: 40px;
-  border-bottom: 1px solid #f0f0f0;
   position: sticky;
   top: 0;
+  height: 90px;
   background: #fff;
   z-index: 1;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+  border-bottom: 1px solid #f0f0f0;
+  min-width: 100%;
+  overflow: hidden;
 }
 
-.monthMarkers {
+.phaseMarkers {
   position: relative;
-  height: 100%;
-  padding: 4px 0;
+  height: 40px;
   border-bottom: 1px solid #f0f0f0;
 }
 
-.monthMarker {
+.phaseSection {
+  position: absolute;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  &:not(:last-child) .phaseLine {
+    border-right: 1px dashed #d9d9d9;
+  }
+}
+
+.phaseTitle {
+  padding: 4px 8px;
+  background: #fff;
+  border-radius: 4px;
+  font-size: 13px;
+  color: #333;
+  white-space: nowrap;
+  font-weight: 500;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+}
+
+.phaseLine {
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: calc(100vh - 100px);
+  pointer-events: none;
+}
+
+.timeMarkers {
+  position: relative;
+  height: 40px;
+  padding-top: 8px;
+}
+
+.timeMarker {
   position: absolute;
   transform: translateX(-50%);
-  font-size: 10px;
+  font-size: 12px;
   color: #666;
-  padding: 0 4px;
-  white-space: nowrap;
+  padding: 2px 4px;
   background: #fff;
-  border-radius: 2px;
   
   &::after {
     content: '';
     position: absolute;
     left: 50%;
-    bottom: -8px;
-    height: 4px;
+    top: 24px;
+    height: 6px;
     width: 1px;
-    background: #e8e8e8;
+    background: #999;
   }
 }
 
-.timelineContent {
+.tasksContainer {
   position: relative;
-  padding: 0 40px 24px 0;
-}
-
-.phaseRow {
-  border-bottom: 1px solid #f0f0f0;
-  position: relative;
-  transition: background-color 0.3s;
-  padding: 4px 0;
-
-  &:hover {
-    background: #fafafa;
-  }
-
-  &:last-child {
-    border-bottom: none;
-  }
-}
-
-.phaseTasks {
-  position: relative;
-  height: 100%;
-  padding: 4px 0;
+  min-height: calc(100vh - 180px);
+  padding: 40px 0;
+  margin-top: 20px;
+  min-width: 100%;
 }
 
 .taskItem {
   position: absolute;
-  height: 44px;
+  height: 88px;
   background: #fff;
-  cursor: pointer;
-  transition: all 0.3s;
-  min-width: 80px;
-  max-width: 200px;
   border-radius: 4px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  overflow: visible;
-
+  transition: all 0.3s;
+  cursor: pointer;
+  
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -152,32 +139,27 @@
   }
 }
 
-.taskCard {
-  cursor: grab;
-  
-  &:active {
-    cursor: grabbing;
-  }
-}
+.dragTimeIndicator {
+  position: absolute;
+  background: rgba(0, 0, 0, 0.75);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  pointer-events: none;
+  z-index: 1000;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  top: -35px;
 
-.scrollContainer {
-  &::-webkit-scrollbar {
-    height: 8px;
-    width: 8px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: #f5f5f5;
-    border-radius: 4px;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: #ddd;
-    border-radius: 4px;
-    border: 2px solid #f5f5f5;
-
-    &:hover {
-      background: #ccc;
-    }
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 4px solid rgba(0, 0, 0, 0.75);
   }
 } 
