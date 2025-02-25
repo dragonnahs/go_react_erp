@@ -44,10 +44,18 @@ const ProjectTimeline: React.FC = () => {
 
   if (!project) return null;
 
-  // 计算阶段的宽度
+  // 修改计算阶段宽度的函数
   const getPhaseWidth = (tasks: Task[]) => {
     if (!tasks || tasks.length === 0) return TASK_WIDTH * 2;
 
+    // 计算需要的列数
+    const taskColumns = calculateTaskLayout(tasks);
+    const columnCount = taskColumns.length;
+    
+    // 计算所需的最小宽度
+    const minWidth = columnCount * (TASK_WIDTH + TASK_SPACING) + TASK_SPACING;
+    
+    // 计算基于时间跨度的宽度
     const startTimes = tasks.map(task => dayjs(task.startTime));
     const endTimes = tasks.map(task => dayjs(task.endTime));
     
@@ -58,10 +66,13 @@ const ProjectTimeline: React.FC = () => {
       curr.isAfter(max) ? curr : max, endTimes[0]
     );
     
-    return Math.max(
+    const timeBasedWidth = Math.max(
       phaseEnd.diff(phaseStart, 'day') * 5 + TASK_WIDTH,
       TASK_WIDTH * 2
     );
+
+    // 返回两种计算方式中的较大值
+    return Math.max(minWidth, timeBasedWidth);
   };
 
   // 修改计算任务布局的函数
