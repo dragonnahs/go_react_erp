@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { message } from 'antd';
 import dayjs from 'dayjs';
-import { getProject, createTask } from '@/services/project';
+import { getProject, createTask, updateTask } from '@/services/project';
 import type { Project, Task, ProjectPhase } from '@/types/project';
 import TaskCard from './components/TaskCard';
 import styles from './index.less';
@@ -145,8 +145,15 @@ const ProjectTimeline: React.FC = () => {
 
   const handleTaskUpdate = async (values: any) => {
     try {
-      // 调用更新任务的API
-      // await updateTask(editingTask!.id, values);
+      await updateTask(editingTask!.id.toString(), {
+        title: values.title,
+        description: values.description,
+        startTime: values.startTime.format('YYYY-MM-DD HH:mm:ss'),
+        endTime: values.endTime.format('YYYY-MM-DD HH:mm:ss'),
+        status: values.status,
+        phase: editingTask!.phase // 保持原有阶段不变
+      });
+      
       message.success('更新成功');
       setEditingTask(null);
       fetchProjectData(); // 重新获取数据

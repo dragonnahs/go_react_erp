@@ -60,6 +60,16 @@ func (s *ProjectService) CreateTask(task *model.Task) error {
 	return nil
 }
 
+// UpdateTask 更新任务
+func (s *ProjectService) UpdateTask(task *model.Task) error {
+	// 验证状态是否有效
+	if task.Status != "" && !isValidStatus(task.Status) {
+		return errno.ErrInvalidParam.WithMessage("无效的任务状态")
+	}
+
+	return s.projectRepo.UpdateTask(task)
+}
+
 // 辅助函数：验证阶段是否有效
 func isValidPhase(phase model.Phase) bool {
 	validPhases := []model.Phase{

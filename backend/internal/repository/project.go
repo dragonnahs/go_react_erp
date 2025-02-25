@@ -62,4 +62,9 @@ func (r *ProjectRepository) UpdateTaskStatus(taskID uint, status model.TaskStatu
 // CreateTask 创建任务
 func (r *ProjectRepository) CreateTask(task *model.Task) error {
 	return database.DB.Create(task).Error
+}
+
+// UpdateTask 更新任务
+func (r *ProjectRepository) UpdateTask(task *model.Task) error {
+	return database.DB.Model(task).Updates(task).Error
 } 
