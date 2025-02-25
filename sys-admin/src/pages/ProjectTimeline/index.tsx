@@ -6,6 +6,7 @@ import type { Project, Task, ProjectPhase } from '@/types/project';
 import TaskCard from './components/TaskCard';
 import styles from './index.less';
 import { DragDropContext, Draggable, Droppable, DropResult } from '@hello-pangea/dnd';
+import TaskEditModal from './components/TaskEditModal';
 
 const PHASE_TITLES = {
   preparation: '项目准备',
@@ -23,6 +24,7 @@ type PhaseKey = keyof typeof PHASE_TITLES;
 
 const ProjectTimeline: React.FC = () => {
   const [project, setProject] = useState<Project>();
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
 
   const fetchProjectData = async () => {
     try {
@@ -133,6 +135,23 @@ const ProjectTimeline: React.FC = () => {
     );
   };
 
+  const handleTaskClick = (task: Task) => {
+    console.log(task);
+    setEditingTask(task);
+  };
+
+  const handleTaskUpdate = async (values: any) => {
+    try {
+      // 调用更新任务的API
+      // await updateTask(editingTask!.id, values);
+      message.success('更新成功');
+      setEditingTask(null);
+      fetchProjectData(); // 重新获取数据
+    } catch (error) {
+      message.error('更新失败');
+    }
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.timeline}>
@@ -171,6 +190,7 @@ const ProjectTimeline: React.FC = () => {
                             <div 
                               key={task.id}
                               className={styles.taskItem}
+                              onClick={() => handleTaskClick(task)}
                               style={{
                                 width: TASK_WIDTH,
                                 height: TASK_HEIGHT,
@@ -236,6 +256,12 @@ const ProjectTimeline: React.FC = () => {
           );
         })}
       </div>
+      <TaskEditModal
+        visible={!!editingTask}
+        task={editingTask}
+        onOk={handleTaskUpdate}
+        onCancel={() => setEditingTask(null)}
+      />
     </div>
   );
 };

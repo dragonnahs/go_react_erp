@@ -1500,3 +1500,9 @@
 {"level":"info","time":"2025-02-25T14:03:37.402+0800","caller":"middleware/logger.go:20","msg":"incoming request","status":200,"method":"GET","path":"/api/v1/users/routes","query":"","ip":"::1","cost":0.2435399}
 {"level":"info","time":"2025-02-25T14:03:38.224+0800","caller":"middleware/logger.go:20","msg":"incoming request","status":200,"method":"GET","path":"/api/v1/projects/current","query":"","ip":"::1","cost":0.1858034}
 {"level":"info","time":"2025-02-25T14:06:52.285+0800","caller":"middleware/logger.go:20","msg":"incoming request","status":200,"method":"GET","path":"/api/v1/projects/current","query":"","ip":"::1","cost":0.1433521}
+{"level":"info","time":"2025-02-25T14:07:16.226+0800","caller":"middleware/logger.go:20","msg":"incoming request","status":200,"method":"GET","path":"/api/v1/users/routes","query":"","ip":"::1","cost":0.2777523}
+{"level":"info","time":"2025-02-25T14:07:17.987+0800","caller":"middleware/logger.go:20","msg":"incoming request","status":200,"method":"GET","path":"/api/v1/users/current","query":"","ip":"::1","cost":0.0725155}
+{"level":"info","time":"2025-02-25T14:07:18.150+0800","caller":"middleware/logger.go:20","msg":"incoming request","status":200,"method":"GET","path":"/api/v1/users/routes","query":"","ip":"::1","cost":0.2336547}
+{"level":"info","time":"2025-02-25T14:07:19.466+0800","caller":"middleware/logger.go:20","msg":"incoming request","status":200,"method":"GET","path":"/api/v1/projects/current","query":"","ip":"::1","cost":0.1538709}
+{"level":"info","time":"2025-02-25T14:11:13.902+0800","caller":"middleware/logger.go:20","msg":"incoming request","status":200,"method":"GET","path":"/api/v1/projects/current","query":"","ip":"::1","cost":0.13069}
+{"level":"info","time":"2025-02-25T14:20:52.339+0800","caller":"middleware/logger.go:20","msg":"incoming request","status":200,"method":"GET","path":"/api/v1/projects/current","query":"","ip":"::1","cost":0.132356}
