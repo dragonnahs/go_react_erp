@@ -57,4 +57,9 @@ func (r *ProjectRepository) UpdateTaskStatus(taskID uint, status model.TaskStatu
 	return database.DB.Model(&model.Task{}).
 		Where("id = ?", taskID).
 		Update("status", status).Error
+}
+
+// CreateTask 创建任务
+func (r *ProjectRepository) CreateTask(task *model.Task) error {
+	return database.DB.Create(task).Error
 } 

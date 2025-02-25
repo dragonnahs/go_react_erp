@@ -22,4 +22,9 @@ func RegisterProjectRoutes(r *gin.RouterGroup) {
 		tasks.PUT("/:taskId/position", projectController.UpdateTaskPosition)
 		tasks.PUT("/:taskId/status", projectController.UpdateTaskStatus)
 	}
+
+	projectGroup := r.Group("/api/project")
+	{
+		projectGroup.POST("/tasks", projectController.CreateTask)
+	}
 } 

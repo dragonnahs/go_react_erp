@@ -141,4 +141,51 @@ func (c *ProjectController) UpdateTaskStatus(ctx *gin.Context) {
 	}
 
 	response.Success(ctx, nil)
+}
+
+// CreateTask 创建任务
+func (pc *ProjectController) CreateTask(c *gin.Context) {
+	var req struct {
+		Title       string `json:"title" binding:"required"`
+		Description string `json:"description"`
+		StartTime   string `json:"startTime" binding:"required"`
+		EndTime     string `json:"endTime" binding:"required"`
+		Status      string `json:"status" binding:"required"`
+		Phase       string `json:"phase" binding:"required"`
+		ProjectId   uint   `json:"projectId" binding:"required"`
+	}
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		response.Error(c, 400, err.Error())
+		return
+	}
+
+	// 解析时间字符串
+	startTime, err := time.Parse("2006-01-02 15:04:05", req.StartTime)
+	if err != nil {
+		response.Error(c, 400, "无效的开始时间格式")
+		return
+	}
+	endTime, err := time.Parse("2006-01-02 15:04:05", req.EndTime)
+	if err != nil {
+		response.Error(c, 400, "无效的结束时间格式")
+		return
+	}
+
+	task := &model.Task{
+		Title:       req.Title,
+		Description: req.Description,
+		StartTime:   startTime,
+		EndTime:     endTime,
+		Status:      model.TaskStatus(req.Status),
+		Phase:       model.Phase(req.Phase),
+		ProjectID:   req.ProjectId,
+	}
+
+	if err := pc.projectService.CreateTask(task); err != nil {
+		response.Error(c, 500, err.Error())
+		return
+	}
+
+	response.Success(c, task)
 } 

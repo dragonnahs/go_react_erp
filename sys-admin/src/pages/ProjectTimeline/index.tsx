@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { message } from 'antd';
 import dayjs from 'dayjs';
-import { getProject } from '@/services/project';
+import { getProject, createTask } from '@/services/project';
 import type { Project, Task, ProjectPhase } from '@/types/project';
 import TaskCard from './components/TaskCard';
 import styles from './index.less';
 import { DragDropContext, Draggable, Droppable, DropResult } from '@hello-pangea/dnd';
 import TaskEditModal from './components/TaskEditModal';
+import { PlusOutlined } from '@ant-design/icons';
+import type { Dayjs } from 'dayjs';
 
 const PHASE_TITLES = {
   preparation: '项目准备',
@@ -25,6 +27,7 @@ type PhaseKey = keyof typeof PHASE_TITLES;
 const ProjectTimeline: React.FC = () => {
   const [project, setProject] = useState<Project>();
   const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [addingPhase, setAddingPhase] = useState<PhaseKey | null>(null);
 
   const fetchProjectData = async () => {
     try {
@@ -152,6 +155,79 @@ const ProjectTimeline: React.FC = () => {
     }
   };
 
+  // 获取阶段的最早和最晚时间
+  const getPhaseTimeRange = (phaseKey: PhaseKey): { earliest: Dayjs | null; latest: Dayjs | null } => {
+    const tasks = project.phases[phaseKey]?.tasks || [];
+    if (tasks.length === 0) return { earliest: null, latest: null };
+
+    const times = tasks.map(task => ({
+      start: dayjs(task.startTime),
+      end: dayjs(task.endTime)
+    }));
+
+    return {
+      earliest: times.reduce((min, curr) => 
+        curr.start.isBefore(min) ? curr.start : min, times[0].start),
+      latest: times.reduce((max, curr) => 
+        curr.end.isAfter(max) ? curr.end : max, times[0].end)
+    };
+  };
+
+  // 验证任务时间是否有效
+  const validateTaskTime = (phase: PhaseKey, startTime: Dayjs, endTime: Dayjs): boolean => {
+    const phases = Object.keys(PHASE_TITLES) as PhaseKey[];
+    const phaseIndex = phases.indexOf(phase);
+    
+    // 检查前一个阶段
+    if (phaseIndex > 0) {
+      const prevPhase = phases[phaseIndex - 1];
+      const { latest } = getPhaseTimeRange(prevPhase);
+      if (latest && startTime.isBefore(latest)) {
+        message.error('任务开始时间不能早于上一阶段的最晚时间');
+        return false;
+      }
+    }
+
+    // 检查后一个阶段
+    if (phaseIndex < phases.length - 1) {
+      const nextPhase = phases[phaseIndex + 1];
+      const { earliest } = getPhaseTimeRange(nextPhase);
+      if (earliest && endTime.isAfter(earliest)) {
+        message.error('任务结束时间不能晚于下一阶段的最早时间');
+        return false;
+      }
+    }
+
+    return true;
+  };
+
+  // 修改处理新增任务的函数
+  const handleAddTask = async (values: any) => {
+    if (!addingPhase) return;
+
+    const startTime = values.startTime as Dayjs;
+    const endTime = values.endTime as Dayjs;
+
+    if (!validateTaskTime(addingPhase, startTime, endTime)) {
+      return;
+    }
+
+    try {
+      await createTask({
+        ...values,
+        phase: addingPhase,
+        startTime: startTime.format('YYYY-MM-DD HH:mm:ss'),
+        endTime: endTime.format('YYYY-MM-DD HH:mm:ss')
+      });
+      
+      message.success('添加成功');
+      setAddingPhase(null);
+      fetchProjectData();
+    } catch (error) {
+      message.error('添加失败');
+    }
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.timeline}>
@@ -167,7 +243,14 @@ const ProjectTimeline: React.FC = () => {
               style={{ width }}
             >
               <div className={styles.phaseHeader}>
-                {PHASE_TITLES[phaseKey]}
+                <span>{PHASE_TITLES[phaseKey]}</span>
+                <PlusOutlined 
+                  className={styles.addIcon}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setAddingPhase(phaseKey);
+                  }}
+                />
               </div>
               <div className={styles.phaseContent}>
                 {(() => {
@@ -261,6 +344,12 @@ const ProjectTimeline: React.FC = () => {
         task={editingTask}
         onOk={handleTaskUpdate}
         onCancel={() => setEditingTask(null)}
+      />
+      <TaskEditModal
+        visible={!!addingPhase}
+        task={null}
+        onOk={handleAddTask}
+        onCancel={() => setAddingPhase(null)}
       />
     </div>
   );
