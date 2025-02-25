@@ -107,6 +107,32 @@ const ProjectTimeline: React.FC = () => {
     return columns;
   };
 
+  // 添加箭头组件
+  const TaskArrow: React.FC<{
+    from: { x: number; y: number };
+    to: { x: number; y: number };
+    direction: 'right' | 'down';
+  }> = ({ from, to, direction }) => {
+    const arrowStyle = direction === 'down' ? {
+      height: to.y - from.y - TASK_HEIGHT,
+      width: '2px',
+      left: from.x + TASK_WIDTH / 2,
+      top: from.y + TASK_HEIGHT,
+    } : {
+      width: to.x - from.x - TASK_WIDTH,
+      height: '2px',
+      left: from.x + TASK_WIDTH,
+      top: from.y + TASK_HEIGHT / 2,
+    };
+
+    return (
+      <div 
+        className={`${styles.taskArrow} ${styles[direction]}`}
+        style={arrowStyle}
+      />
+    );
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.timeline}>
@@ -127,33 +153,83 @@ const ProjectTimeline: React.FC = () => {
               <div className={styles.phaseContent}>
                 {(() => {
                   const taskColumns = calculateTaskLayout(phaseTasks);
-                  return taskColumns.map((column, columnIndex) => (
-                    <div 
-                      key={columnIndex} 
-                      className={styles.taskColumn}
-                      style={{ 
-                        position: 'absolute',
-                        left: columnIndex * (TASK_WIDTH + TASK_SPACING),
-                        top: 0,
-                        height: '100%'
-                      }}
-                    >
-                      {column.map((task, rowIndex) => (
+                  return (
+                    <>
+                      {/* 渲染任务 */}
+                      {taskColumns.map((column, columnIndex) => (
                         <div 
-                          key={task.id}
-                          className={styles.taskItem}
-                          style={{
-                            width: TASK_WIDTH,
-                            height: TASK_HEIGHT,
+                          key={columnIndex} 
+                          className={styles.taskColumn}
+                          style={{ 
                             position: 'absolute',
-                            top: rowIndex * (TASK_HEIGHT + TASK_SPACING)
+                            left: columnIndex * (TASK_WIDTH + TASK_SPACING),
+                            top: 0,
+                            height: '100%'
                           }}
                         >
-                          <TaskCard task={task} />
+                          {column.map((task, rowIndex) => (
+                            <div 
+                              key={task.id}
+                              className={styles.taskItem}
+                              style={{
+                                width: TASK_WIDTH,
+                                height: TASK_HEIGHT,
+                                position: 'absolute',
+                                top: rowIndex * (TASK_HEIGHT + TASK_SPACING)
+                              }}
+                            >
+                              <TaskCard task={task} />
+                            </div>
+                          ))}
                         </div>
                       ))}
-                    </div>
-                  ));
+
+                      {/* 渲染箭头 */}
+                      {taskColumns.map((column, columnIndex) => 
+                        column.map((task, rowIndex) => {
+                          const arrows = [];
+                          
+                          // 向下连接
+                          if (rowIndex < column.length - 1) {
+                            arrows.push(
+                              <TaskArrow
+                                key={`down-${task.id}`}
+                                from={{
+                                  x: columnIndex * (TASK_WIDTH + TASK_SPACING),
+                                  y: rowIndex * (TASK_HEIGHT + TASK_SPACING)
+                                }}
+                                to={{
+                                  x: columnIndex * (TASK_WIDTH + TASK_SPACING),
+                                  y: (rowIndex + 1) * (TASK_HEIGHT + TASK_SPACING)
+                                }}
+                                direction="down"
+                              />
+                            );
+                          }
+
+                          // 向右连接
+                          if (columnIndex < taskColumns.length - 1) {
+                            arrows.push(
+                              <TaskArrow
+                                key={`right-${task.id}`}
+                                from={{
+                                  x: columnIndex * (TASK_WIDTH + TASK_SPACING),
+                                  y: rowIndex * (TASK_HEIGHT + TASK_SPACING)
+                                }}
+                                to={{
+                                  x: (columnIndex + 1) * (TASK_WIDTH + TASK_SPACING),
+                                  y: rowIndex * (TASK_HEIGHT + TASK_SPACING)
+                                }}
+                                direction="right"
+                              />
+                            );
+                          }
+
+                          return arrows;
+                        })
+                      )}
+                    </>
+                  );
                 })()}
               </div>
             </div>
