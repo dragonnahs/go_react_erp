@@ -43,6 +43,11 @@ export default defineConfig({
       component: './Home',
     },
     {
+      name: '钱包',
+      path: '/wallet',
+      component: './Wallet',
+    },
+    {
       path: '*',
       component: './404',
       layout: false,
