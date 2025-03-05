@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Tabs, Button, message } from 'antd';
 import { WalletOutlined, HistoryOutlined } from '@ant-design/icons';
-import { Connection, PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js';
+import { ethers } from 'ethers';
 import WalletAssets from './components/WalletAssets';
 import TransactionHistory from './components/TransactionHistory';
 import ImportWallet from './components/ImportWallet';
@@ -14,20 +14,23 @@ const WalletPage: React.FC = () => {
   const [balance, setBalance] = useState(0);
   const [publicKey, setPublicKey] = useState<string>('');
   
-  // 连接到 Solana 测试网
-  const connection = new Connection('https://api.testnet.solana.com', 'confirmed');
+  // 连接到 Sepolia 测试网
+  const provider = new ethers.JsonRpcProvider('https://rpc-sepolia.rockx.com');
+
   const fetchBalance = async (address: string) => {
+    console.log('address11', address);
     try {
-      const pubKey = new PublicKey(address);
-      const balance = await connection.getBalance(pubKey);
-      setBalance(balance / LAMPORTS_PER_SOL);
+      console.log('provider', provider);
+      const balance = await provider.getBalance(address);
+      console.log('balance', balance);
+      setBalance(Number(ethers.formatEther(balance)));
     } catch (error) {
+      console.log('error', error);
       message.error('获取余额失败');
     }
   };
 
   useEffect(() => {
-    
     // 检查本地存储的钱包信息
     const savedWallet = localStorage.getItem('wallet');
     if (savedWallet) {
@@ -38,7 +41,15 @@ const WalletPage: React.FC = () => {
     }
   }, []);
 
-  
+  // 定期更新余额
+  useEffect(() => {
+    if (isWalletConnected && publicKey) {
+      const interval = setInterval(() => {
+        fetchBalance(publicKey);
+      }, 30000); // 每30秒更新一次
+      return () => clearInterval(interval);
+    }
+  }, [isWalletConnected, publicKey]);
 
   const handleDisconnect = () => {
     localStorage.removeItem('wallet');
@@ -73,7 +84,7 @@ const WalletPage: React.FC = () => {
   return (
     <div className={styles.container}>
       <Card
-        title="Solana 钱包"
+        title="Sepolia ETH 钱包"
         extra={
           isWalletConnected ? (
             <Button onClick={handleDisconnect} danger>

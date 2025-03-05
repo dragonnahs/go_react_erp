@@ -36,11 +36,11 @@ const WalletAssets: React.FC<WalletAssetsProps> = ({ balance, publicKey }) => {
 
       <Card
         size="small"
-        title="SOL 余额"
+        title="ETH 余额"
         style={{ marginTop: 16 }}
       >
         <Typography.Title level={2}>
-          {balance.toFixed(4)} SOL
+          {balance.toFixed(4)} ETH
         </Typography.Title>
       </Card>
 
