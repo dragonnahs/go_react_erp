@@ -18,7 +18,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({ publicKey }) =>
       setLoading(true);
       // 使用 Etherscan API 获取地址的交易记录(infura不能获取当前钱包的交易记录，而是获取所有的，所以最好是通过etherscan获取)
       const response = await fetch(
-        `https://api-sepolia.etherscan.io/api?module=account&action=txlist&address=${publicKey}&startblock=0&endblock=99999999&sort=desc&apikey=ec1a63ba444f4ecb8c71a67fbbbbe065`
+        `https://api-sepolia.etherscan.io/api?module=account&action=txlist&address=${publicKey}&startblock=0&endblock=99999999&sort=desc&apikey=GE5FKITJ2ZHCR1YMIZVWCQQSJ9QP12PZ61`
       );
       const data = await response.json();
       
